@@ -1,0 +1,94 @@
+/* DASHBOARD - Duck Centro de Distribuição */
+ 
+.dashboard-container {
+  width: 100%;
+  height: 100vh;
+  background: #f5f6fa;
+  display: flex;
+  flex-direction: column;
+  font-family: 'Segoe UI', sans-serif;
+}
+ 
+/* HEADER AMARELO
+ */
+.dashboard-header {
+  width: 100%;
+  background: linear-gradient(135deg, #f5c400, #f0a500);
+  padding: 0 40px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 2px 12px rgba(245, 196, 0, 0.3);
+}
+ 
+.dashboard-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+ 
+.dashboard-logo-img {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+}
+ 
+.dashboard-logo-name {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: white;
+  letter-spacing: -0.5px;
+}
+ 
+/* Texto central de boas-vindas */
+.dashboard-welcome-text {
+  font-size: 20px;
+  color: white;
+  font-weight: 400;
+  letter-spacing: 0.2px;
+}
+ 
+.dashboard-welcome-text strong {
+  font-weight: 700;
+}
+ 
+.dashboard-user {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+ 
+.dashboard-avatar {
+  width: 36px;
+  height: 36px;
+  background: rgba(255,255,255,0.3);
+  border: 2px solid rgba(255,255,255,0.6);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: white;
+}
+ 
+.dashboard-logout-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: rgba(255,255,255,0.2);
+  border: 1.5px solid rgba(255,255,255,0.5);
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+ 
+.dashboard-logout-btn:hover {
+  background: rgba(255,255,255,0.35);
+}
+ 
