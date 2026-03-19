@@ -1,0 +1,326 @@
+/* LOGIN PAGE - Duck Centro de Distribuição */
+ 
+.login-container {
+  display: flex;
+  width: 100%;
+  height: 100vh;
+  font-family: 'Segoe UI', sans-serif;
+  overflow: hidden;
+}
+ 
+/* PAINEL ESQUERDO */
+.login-left {
+  width: 45%;
+  background: linear-gradient(160deg, #f5c400 0%, #f0a500 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48px;
+  flex-shrink: 0;
+}
+ 
+.login-left-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 16px;
+  animation: fadeInLeft 0.6s ease both;
+}
+ 
+/* logo box arredondada com a imagem  */
+.login-logo-box {
+  background: white;
+  border-radius: 24px;
+  width: 300px;
+  height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+  margin-bottom: 8px;
+}
+ 
+.login-logo-img {
+  width: 270px;
+  height: 270px;
+  object-fit: contain;
+}
+ 
+.login-logo-fallback {
+  font-size: 64px;
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+ 
+/* Título */
+.login-brand-title {
+  font-size: 2.4rem;
+  font-weight: 800;
+  color: white;
+  line-height: 1.2;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+ 
+.login-brand-subtitle {
+  font-size: 1rem;
+  color: rgba(255,255,255,0.9);
+  font-weight: 400;
+  letter-spacing: 0.5px;
+}
+ 
+.login-brand-divider {
+  width: 48px;
+  height: 3px;
+  background: rgba(255,255,255,0.6);
+  border-radius: 2px;
+  margin: 4px 0;
+}
+ 
+.login-brand-description {
+  font-size: 0.9rem;
+  color: rgba(255,255,255,0.85);
+  line-height: 1.7;
+  max-width: 300px;
+}
+ 
+/*PAINEL DIREITO  */
+.login-right {
+  flex: 1;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48px;
+  overflow-y: auto;
+}
+ 
+.login-form-wrapper {
+  width: 100%;
+  max-width: 420px;
+  animation: fadeInRight 0.6s ease both;
+}
+ 
+.login-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 6px;
+}
+ 
+.login-subtitle {
+  font-size: 0.95rem;
+  color: #888;
+  margin-bottom: 32px;
+}
+ 
+/* FORMULÁRIO DE LOGIN */
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+ 
+.login-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+ 
+.login-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #333;
+}
+ 
+.login-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+ 
+.login-input-icon {
+  position: absolute;
+  left: 14px;
+  display: flex;
+  align-items: center;
+  pointer-events: none;
+}
+ 
+.login-input {
+  width: 100%;
+  padding: 13px 44px;
+  border: 1.5px solid #e8e8e8;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  color: #333;
+  background: #f7f7f7;
+  outline: none;
+  transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+}
+ 
+.login-input::placeholder {
+  color: #bbb;
+}
+ 
+.login-input:focus {
+  border-color: #f5c400;
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(245, 196, 0, 0.12);
+}
+ 
+.login-toggle-password {
+  position: absolute;
+  right: 14px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  padding: 0;
+  transition: opacity 0.2s;
+}
+ 
+.login-toggle-password:hover {
+  opacity: 0.7;
+}
+ 
+/* LEMBRAR-ME + ESQUECEU A SENHA */
+.login-options {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+ 
+.login-remember {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: #444;
+  user-select: none;
+}
+ 
+.login-remember input[type="checkbox"] {
+  display: none;
+}
+ 
+.login-checkbox-custom {
+  width: 18px;
+  height: 18px;
+  border: 2px solid #333;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s, border-color 0.2s;
+  flex-shrink: 0;
+}
+ 
+.login-remember input[type="checkbox"]:checked + .login-checkbox-custom {
+  background: #333;
+  border-color: #333;
+}
+ 
+.login-remember input[type="checkbox"]:checked + .login-checkbox-custom::after {
+  content: '';
+  width: 10px;
+  height: 6px;
+  border-left: 2px solid white;
+  border-bottom: 2px solid white;
+  transform: rotate(-45deg) translateY(-1px);
+}
+ 
+.login-forgot {
+  font-size: 0.9rem;
+  color: #f0a500;
+  font-weight: 600;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+ 
+.login-forgot:hover {
+  color: #d48c00;
+  text-decoration: underline;
+}
+ 
+/* BOTÃO ENTRAR */
+.login-btn {
+  width: 100%;
+  padding: 15px;
+  background: linear-gradient(135deg, #f5c400, #f0a500);
+  color: white;
+  font-size: 1rem;
+  font-weight: 700;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  letter-spacing: 0.5px;
+  transition: opacity 0.2s, transform 0.1s, box-shadow 0.2s;
+  box-shadow: 0 4px 16px rgba(245, 196, 0, 0.35);
+  margin-top: 4px;
+}
+ 
+.login-btn:hover {
+  opacity: 0.93;
+  box-shadow: 0 6px 20px rgba(245, 196, 0, 0.45);
+}
+ 
+.login-btn:active {
+  transform: scale(0.98);
+}
+ 
+/* RODAPÉ DO FORMULÁRIO */
+.login-register {
+  margin-top: 24px;
+  text-align: center;
+  font-size: 0.9rem;
+  color: #888;
+}
+ 
+.login-register-link {
+  color: #f0a500;
+  font-weight: 600;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+ 
+.login-register-link:hover {
+  color: #d48c00;
+  text-decoration: underline;
+}
+ 
+/* ANIMAÇÕES AO ACESSAR A PÁGINA */
+@keyframes fadeInLeft {
+  from { opacity: 0; transform: translateX(-20px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+ 
+@keyframes fadeInRight {
+  from { opacity: 0; transform: translateX(20px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+ 
+/* Dica de credenciais */
+.login-hint {
+  background: #fffbea;
+  border: 1.5px solid #f5c400;
+  border-radius: 8px;
+  padding: 10px 16px;
+  font-size: 0.85rem;
+  color: #7a5c00;
+  margin-bottom: 20px;
+}
+
+/* Mensagem de erro */
+.login-erro {
+  color: #d32f2f;
+  font-size: 0.85rem;
+  background: #fff5f5;
+  border: 1.5px solid #ffcdd2;
+  border-radius: 8px;
+  padding: 10px 16px;
+  text-align: center;
+}
