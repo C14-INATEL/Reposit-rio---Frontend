@@ -1,11 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import '../styles/Login.css'
- 
-// Usuário mockado para teste
-const MOCK_USER = 'admin'
-const MOCK_PASS = 'admin'
- 
+
 function Login() {
   const navigate = useNavigate()
   const [showPassword, setShowPassword] = useState(false)
@@ -13,15 +9,44 @@ function Login() {
   const [usuario, setUsuario] = useState('')
   const [senha, setSenha] = useState('')
   const [erro, setErro] = useState('')
- 
-  const handleSubmit = (e) => {
+  const [carregando, setCarregando] = useState(false)
+
+  const handleSubmit = async (e) => {
     e.preventDefault()
     setErro('')
- 
-    if (usuario === MOCK_USER && senha === MOCK_PASS) {
-      navigate('/dashboard', { state: { usuario } })
-    } else {
-      setErro('Usuário ou senha incorretos.')
+    setCarregando(true)
+
+    try {
+      const response = await fetch('http://localhost:3000/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ usuario, senha }),
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        
+        // Armazenar dados do usuário na sessão
+        sessionStorage.setItem('usuario', usuario)
+        sessionStorage.setItem('tipo', data.tipo)
+        
+        // Se "Lembrar-me" estiver ativo, salvar no localStorage
+        if (rememberMe) {
+          localStorage.setItem('usuarioSalvo', usuario)
+        }
+        
+        navigate('/dashboard', { state: { usuario, tipo: data.tipo } })
+      } else {
+        const data = await response.json()
+        setErro(data.mensagem || 'Usuário ou senha incorretos.')
+      }
+    } catch (err) {
+      setErro('Erro ao conectar com o servidor. Verifique se o backend está rodando.')
+      console.error('Erro de conexão:', err)
+    } finally {
+      setCarregando(false)
     }
   }
  
@@ -135,7 +160,9 @@ function Login() {
               <a href="#" className="login-forgot">Esqueceu a senha?</a>
             </div>
  
-            <button type="submit" className="login-btn">Entrar</button>
+            <button type="submit" className="login-btn" disabled={carregando}>
+              {carregando ? 'Entrando...' : 'Entrar'}
+            </button>
           </form>
  
           <p className="login-register">

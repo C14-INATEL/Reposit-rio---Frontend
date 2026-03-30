@@ -1,12 +1,26 @@
 import { useNavigate, useLocation } from 'react-router-dom'
+import { useEffect } from 'react'
 import '../styles/Dashboard.css'
- 
+
 function Dashboard() {
   const navigate = useNavigate()
   const location = useLocation()
-  const usuario = location.state?.usuario || 'Usuário'
- 
+  
+  // Obter dados do state ou da sessão
+  const usuario = location.state?.usuario || sessionStorage.getItem('usuario') || 'Usuário'
+  const tipo = location.state?.tipo || sessionStorage.getItem('tipo') || 'cliente'
+
+  // Proteger rota: se não estiver autenticado, redirecionar para login
+  useEffect(() => {
+    if (!sessionStorage.getItem('usuario')) {
+      navigate('/')
+    }
+  }, [navigate])
+
   const handleLogout = () => {
+    // Limpar dados de autenticação
+    sessionStorage.removeItem('usuario')
+    sessionStorage.removeItem('tipo')
     navigate('/')
   }
  
