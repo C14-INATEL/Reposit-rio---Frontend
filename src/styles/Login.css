@@ -324,3 +324,24 @@
   padding: 10px 16px;
   text-align: center;
 }
+
+.login-btn-group {
+  display: flex;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.login-btn-group .login-btn {
+  flex: 1;
+}
+
+.login-btn-secondary {
+  background: white !important;
+  color: #f0a500 !important;
+  border: 2px solid #f5c400 !important;
+  box-shadow: none !important;
+}
+
+.login-btn-secondary:hover {
+  background: #fffbea !important;
+}
