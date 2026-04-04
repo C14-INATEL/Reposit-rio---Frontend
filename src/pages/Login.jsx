@@ -134,8 +134,16 @@ function Login() {
               </label>
               <a href="#" className="login-forgot">Esqueceu a senha?</a>
             </div>
- 
+            
+            <div className="login-btn-group">
+
             <button type="submit" className="login-btn">Entrar</button>
+
+            <button type="button" className="login-btn login-btn-secondary" onClick={() => navigate('/')}>
+                 Voltar
+               </button> 
+               
+            </div>
           </form>
  
           <p className="login-register">
