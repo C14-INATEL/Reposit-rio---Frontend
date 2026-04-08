@@ -1,11 +1,7 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import '../styles/Login.css'
- 
-// Usuário mockado para teste
-const MOCK_USER = 'admin'
-const MOCK_PASS = 'admin'
- 
+
 function Login() {
   const navigate = useNavigate()
   const [showPassword, setShowPassword] = useState(false)
@@ -13,15 +9,62 @@ function Login() {
   const [usuario, setUsuario] = useState('')
   const [senha, setSenha] = useState('')
   const [erro, setErro] = useState('')
- 
-  const handleSubmit = (e) => {
+  const [carregando, setCarregando] = useState(false)
+
+  // Usuários mock para navegação sem backend
+  const MOCK_USERS = [
+    { usuario: 'admin', senha: '1234', tipo: 'admin' },
+    { usuario: 'operador', senha: '1234', tipo: 'operador' },
+    { usuario: 'lojista', senha: '1234', tipo: 'lojista' },
+  ]
+
+  const handleSubmit = async (e) => {
     e.preventDefault()
     setErro('')
- 
-    if (usuario === MOCK_USER && senha === MOCK_PASS) {
-      navigate('/dashboard', { state: { usuario } })
-    } else {
-      setErro('Usuário ou senha incorretos.')
+    setCarregando(true)
+
+    // Verifica mock antes de chamar o backend
+    const mockUser = MOCK_USERS.find(u => u.usuario === usuario && u.senha === senha)
+    if (mockUser) {
+      sessionStorage.setItem('usuario', usuario)
+      sessionStorage.setItem('tipo', mockUser.tipo)
+      if (rememberMe) localStorage.setItem('usuarioSalvo', usuario)
+      navigate('/dashboard', { state: { usuario, tipo: mockUser.tipo } })
+      setCarregando(false)
+      return
+    }
+
+    try {
+      const response = await fetch('http://localhost:3000/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ usuario, senha }),
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        
+        // Armazenar dados do usuário na sessão
+        sessionStorage.setItem('usuario', usuario)
+        sessionStorage.setItem('tipo', data.tipo)
+        
+        // Se "Lembrar-me" estiver ativo salva as informações no localStorage
+        if (rememberMe) {
+          localStorage.setItem('usuarioSalvo', usuario)
+        }
+        
+        navigate('/dashboard', { state: { usuario, tipo: data.tipo } })
+      } else {
+        const data = await response.json()
+        setErro(data.mensagem || 'Usuário ou senha incorretos.')
+      }
+    } catch (err) {
+      setErro('Erro ao conectar com o servidor. Verifique se o backend está rodando.')
+      console.error('Erro de conexão:', err)
+    } finally {
+      setCarregando(false)
     }
   }
  
@@ -57,6 +100,7 @@ function Login() {
         <div className="login-form-wrapper">
           <h2 className="login-title">Login</h2>
           <p className="login-subtitle">Acesse sua conta para continuar</p>
+
           <form className="login-form" onSubmit={handleSubmit}>
             {/* Campo Usuário */}
             <div className="login-field">
@@ -134,6 +178,10 @@ function Login() {
               </label>
               <a href="#" className="login-forgot">Esqueceu a senha?</a>
             </div>
+ 
+            <button type="submit" className="login-btn" disabled={carregando}>
+              {carregando ? 'Entrando...' : 'Entrar'}
+            </button>
             
             <div className="login-btn-group">
 
@@ -148,7 +196,7 @@ function Login() {
  
           <p className="login-register">
             Não tem uma conta?{' '}
-            <a href="#" className="login-register-link">Solicitar acesso</a>
+            <Link to="/cadastro" className="login-register-link">Solicitar acesso</Link>
           </p>
         </div>
       </div>
