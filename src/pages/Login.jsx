@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import '../styles/Login.css'
 
 function Login() {
@@ -11,10 +11,28 @@ function Login() {
   const [erro, setErro] = useState('')
   const [carregando, setCarregando] = useState(false)
 
+  // Usuários mock para navegação sem backend
+  const MOCK_USERS = [
+    { usuario: 'admin', senha: '1234', tipo: 'admin' },
+    { usuario: 'operador', senha: '1234', tipo: 'operador' },
+    { usuario: 'lojista', senha: '1234', tipo: 'lojista' },
+  ]
+
   const handleSubmit = async (e) => {
     e.preventDefault()
     setErro('')
     setCarregando(true)
+
+    // Verifica mock antes de chamar o backend
+    const mockUser = MOCK_USERS.find(u => u.usuario === usuario && u.senha === senha)
+    if (mockUser) {
+      sessionStorage.setItem('usuario', usuario)
+      sessionStorage.setItem('tipo', mockUser.tipo)
+      if (rememberMe) localStorage.setItem('usuarioSalvo', usuario)
+      navigate('/dashboard', { state: { usuario, tipo: mockUser.tipo } })
+      setCarregando(false)
+      return
+    }
 
     try {
       const response = await fetch('http://localhost:3000/login', {
@@ -32,7 +50,7 @@ function Login() {
         sessionStorage.setItem('usuario', usuario)
         sessionStorage.setItem('tipo', data.tipo)
         
-        // Se "Lembrar-me" estiver ativo, salvar no localStorage
+        // Se "Lembrar-me" estiver ativo salva as informações no localStorage
         if (rememberMe) {
           localStorage.setItem('usuarioSalvo', usuario)
         }
@@ -82,6 +100,7 @@ function Login() {
         <div className="login-form-wrapper">
           <h2 className="login-title">Login</h2>
           <p className="login-subtitle">Acesse sua conta para continuar</p>
+
           <form className="login-form" onSubmit={handleSubmit}>
             {/* Campo Usuário */}
             <div className="login-field">
@@ -167,7 +186,7 @@ function Login() {
  
           <p className="login-register">
             Não tem uma conta?{' '}
-            <a href="#" className="login-register-link">Solicitar acesso</a>
+            <Link to="/cadastro" className="login-register-link">Solicitar acesso</Link>
           </p>
         </div>
       </div>

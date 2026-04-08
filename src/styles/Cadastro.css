@@ -1,0 +1,397 @@
+/* CADASTRO PAGE - Duck Centro de Distribuição */
+
+.cadastro-container {
+  display: flex;
+  width: 100%;
+  height: 100vh;
+  font-family: 'Segoe UI', sans-serif;
+  overflow: hidden;
+}
+
+/* PAINEL ESQUERDO */
+.cadastro-left {
+  width: 40%;
+  background: linear-gradient(160deg, #f5c400 0%, #f0a500 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px;
+  flex-shrink: 0;
+}
+
+.cadastro-left-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 10px;
+  animation: fadeInLeft 0.6s ease both;
+}
+
+.cadastro-logo-box {
+  background: white;
+  border-radius: 20px;
+  width: 200px;
+  height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  margin-bottom: 4px;
+}
+
+.cadastro-logo-img {
+  width: 175px;
+  height: 175px;
+  object-fit: contain;
+}
+
+.cadastro-logo-fallback {
+  font-size: 56px;
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+
+.cadastro-brand-title {
+  font-size: 2rem;
+  font-weight: 800;
+  color: white;
+  line-height: 1.2;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.cadastro-brand-subtitle {
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 400;
+  letter-spacing: 0.5px;
+}
+
+.cadastro-brand-divider {
+  width: 48px;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 2px;
+  margin: 2px 0;
+}
+
+.cadastro-brand-description {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.85);
+  line-height: 1.6;
+  max-width: 260px;
+}
+
+/* PAINEL DIREITO */
+.cadastro-right {
+  flex: 1;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 48px;
+  overflow: hidden;
+}
+
+.cadastro-form-wrapper {
+  width: 100%;
+  max-width: 460px;
+  animation: fadeInRight 0.6s ease both;
+}
+
+.cadastro-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 4px;
+}
+
+.cadastro-subtitle {
+  font-size: 0.9rem;
+  color: #888;
+  margin-bottom: 20px;
+}
+
+/* FORMULÁRIO */
+.cadastro-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Linha com dois campos lado a lado */
+.cadastro-fields-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.cadastro-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.cadastro-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #333;
+}
+
+/* INPUTS DE TEXTO */
+.cadastro-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.cadastro-input-icon {
+  position: absolute;
+  left: 12px;
+  display: flex;
+  align-items: center;
+  pointer-events: none;
+}
+
+.cadastro-input {
+  width: 100%;
+  padding: 11px 40px;
+  border: 1.5px solid #e8e8e8;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  color: #333;
+  background: #f7f7f7;
+  outline: none;
+  transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+  font-family: 'Segoe UI', sans-serif;
+  box-sizing: border-box;
+}
+
+.cadastro-input::placeholder {
+  color: #bbb;
+}
+
+.cadastro-input:focus {
+  border-color: #f5c400;
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(245, 196, 0, 0.12);
+}
+
+.cadastro-toggle-password {
+  position: absolute;
+  right: 12px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  padding: 0;
+  transition: opacity 0.2s;
+}
+
+.cadastro-toggle-password:hover {
+  opacity: 0.7;
+}
+
+/* DROPDOWN */
+.cadastro-dropdown {
+  position: relative;
+  width: 100%;
+}
+
+.cadastro-dropdown-trigger {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 14px;
+  background: #f7f7f7;
+  border: 1.5px solid #e8e8e8;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-family: 'Segoe UI', sans-serif;
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+  box-sizing: border-box;
+}
+
+.cadastro-dropdown-trigger:hover {
+  border-color: #d0d0d0;
+  background: #f0f0f0;
+}
+
+.cadastro-dropdown-trigger.aberto {
+  border-color: #f5c400;
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(245, 196, 0, 0.12);
+}
+
+.cadastro-dropdown-icone {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  color: #aaa;
+}
+
+.cadastro-dropdown-trigger.aberto .cadastro-dropdown-icone,
+.cadastro-dropdown-trigger:not(.sem-selecao) .cadastro-dropdown-icone {
+  color: #f0a500;
+}
+
+.cadastro-dropdown-valor {
+  flex: 1;
+  color: #333;
+}
+
+.cadastro-dropdown-trigger.sem-selecao .cadastro-dropdown-valor {
+  color: #bbb;
+}
+
+.cadastro-dropdown-seta {
+  display: flex;
+  align-items: center;
+  color: #aaa;
+  transition: transform 0.2s ease;
+  flex-shrink: 0;
+}
+
+.cadastro-dropdown-seta.aberta {
+  transform: rotate(180deg);
+  color: #f0a500;
+}
+
+/* Lista do dropdown */
+.cadastro-dropdown-lista {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  background: #fff;
+  border: 1.5px solid #e8e8e8;
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.10);
+  list-style: none;
+  padding: 6px;
+  margin: 0;
+  z-index: 100;
+  animation: dropdownFadeIn 0.15s ease;
+}
+
+.cadastro-dropdown-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-family: 'Segoe UI', sans-serif;
+  color: #333;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.cadastro-dropdown-item:hover {
+  background: #fff8e1;
+  color: #c47f00;
+}
+
+.cadastro-dropdown-item.selecionado {
+  background: linear-gradient(135deg, #f5c400, #f0a500);
+  color: #fff;
+  font-weight: 600;
+}
+
+.cadastro-dropdown-item.selecionado svg {
+  stroke: #fff;
+}
+
+/* FEEDBACK */
+.cadastro-erro {
+  color: #d32f2f;
+  font-size: 0.82rem;
+  background: #fff5f5;
+  border: 1.5px solid #ffcdd2;
+  border-radius: 8px;
+  padding: 9px 14px;
+  text-align: center;
+}
+
+.cadastro-sucesso {
+  color: #2e7d32;
+  font-size: 0.82rem;
+  background: #f1f8f1;
+  border: 1.5px solid #a5d6a7;
+  border-radius: 8px;
+  padding: 9px 14px;
+  text-align: center;
+}
+
+/* BOTÃO */
+.cadastro-btn {
+  width: 100%;
+  padding: 13px;
+  background: linear-gradient(135deg, #f5c400, #f0a500);
+  color: white;
+  font-size: 0.95rem;
+  font-weight: 700;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  letter-spacing: 0.5px;
+  transition: opacity 0.2s, transform 0.1s, box-shadow 0.2s;
+  box-shadow: 0 4px 16px rgba(245, 196, 0, 0.35);
+  margin-top: 4px;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.cadastro-btn:hover:not(:disabled) {
+  opacity: 0.93;
+  box-shadow: 0 6px 20px rgba(245, 196, 0, 0.45);
+}
+
+.cadastro-btn:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.cadastro-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* RODAPÉ */
+.cadastro-login-link {
+  margin-top: 16px;
+  text-align: center;
+  font-size: 0.88rem;
+  color: #888;
+}
+
+.cadastro-link {
+  color: #f0a500;
+  font-weight: 600;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.cadastro-link:hover {
+  color: #d48c00;
+  text-decoration: underline;
+}
+
+/* ANIMAÇÕES */
+@keyframes fadeInLeft {
+  from { opacity: 0; transform: translateX(-20px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes fadeInRight {
+  from { opacity: 0; transform: translateX(20px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes dropdownFadeIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
