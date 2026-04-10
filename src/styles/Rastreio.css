@@ -1,0 +1,296 @@
+/* RASTREIO - Duck Centro de Distribuição */
+
+.rastreio-container {
+  width: 100%;
+  min-height: 100vh;
+  background: #f5f6fa;
+  display: flex;
+  flex-direction: column;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+/* HEADER - igual ao padrão do projeto */
+.rastreio-header {
+  width: 100%;
+  background: linear-gradient(135deg, #f5c400, #f0a500);
+  padding: 0 40px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 2px 12px rgba(245, 196, 0, 0.3);
+  flex-shrink: 0;
+}
+
+.rastreio-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.rastreio-logo-img {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+}
+
+.rastreio-logo-name {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: white;
+  letter-spacing: -0.5px;
+}
+
+.rastreio-header-center {
+  font-size: 1rem;
+  color: white;
+  font-weight: 400;
+}
+
+.rastreio-btn-voltar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: rgba(255, 255, 255, 0.2);
+  border: 1.5px solid rgba(255, 255, 255, 0.5);
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: white;
+  cursor: pointer;
+  font-family: 'Segoe UI', sans-serif;
+  transition: background 0.2s;
+}
+
+.rastreio-btn-voltar:hover {
+  background: rgba(255, 255, 255, 0.35);
+}
+
+/* MAIN */
+.rastreio-main {
+  flex: 1;
+  padding: 40px;
+  max-width: 900px;
+  width: 100%;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* CARD DE BUSCA */
+.rastreio-card {
+  background: #fff;
+  border-radius: 14px;
+  border: 1px solid #f0f0f0;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.06);
+  padding: 32px;
+}
+
+.rastreio-card-title {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 6px;
+}
+
+.rastreio-card-sub {
+  font-size: 0.9rem;
+  color: #888;
+  margin-bottom: 24px;
+}
+
+.rastreio-input-group {
+  display: flex;
+  gap: 12px;
+}
+
+.rastreio-input {
+  flex: 1;
+  padding: 13px 16px;
+  border: 1.5px solid #e0e0e0;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-family: 'Segoe UI', sans-serif;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.rastreio-input:focus {
+  border-color: #f5c400;
+  box-shadow: 0 0 0 3px rgba(245, 196, 0, 0.12);
+}
+
+.rastreio-btn-buscar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 13px 24px;
+  background: linear-gradient(135deg, #f5c400, #f0a500);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: 'Segoe UI', sans-serif;
+  transition: opacity 0.2s;
+  white-space: nowrap;
+}
+
+.rastreio-btn-buscar:hover {
+  opacity: 0.9;
+}
+
+.rastreio-erro {
+  margin-top: 16px;
+  background: #ffebee;
+  color: #c62828;
+  padding: 12px 16px;
+  border-radius: 8px;
+  border-left: 4px solid #c62828;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+/* RESULTADO */
+.rastreio-resultado {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  animation: fadeIn 0.4s ease both;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* STATUS CARD */
+.rastreio-status-card {
+  background: #fff;
+  border-radius: 14px;
+  border: 1px solid #f0f0f0;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.06);
+  padding: 24px 28px;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.rastreio-status-badge {
+  padding: 8px 20px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+}
+
+.rastreio-status-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.rastreio-codigo-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #999;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.rastreio-codigo-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.rastreio-codigo {
+  font-size: 1.1rem;
+  color: #f0a500;
+  font-family: monospace;
+  letter-spacing: 1px;
+}
+
+.btn-copiar {
+  background: #f0f0f0;
+  border: none;
+  border-radius: 6px;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 0.95rem;
+  transition: all 0.2s;
+}
+
+.btn-copiar:hover {
+  background: #f5c400;
+  color: white;
+}
+
+/* TABELA - reutiliza classes do admin */
+.dash-table-box {
+  background: #fff;
+  border-radius: 14px;
+  border: 1px solid #f0f0f0;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+}
+
+.dash-table-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+.dash-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.dash-table thead tr {
+  background: #fafafa;
+}
+
+.dash-table th {
+  text-align: left;
+  padding: 12px 18px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #999;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.dash-table td {
+  padding: 13px 18px;
+  color: #333;
+}
+
+.td-id   { color: #bbb; font-weight: 600; font-size: 0.82rem; }
+.td-data { color: #999; font-size: 0.85rem; }
+
+/* BADGES */
+.badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.status-pendente  { background: #fff8e1; color: #c47f00; }
+.status-emrota    { background: #fff3cd; color: #f0a500; }
+.status-entregue  { background: #e8f5e9; color: #2e7d32; }
+.status-cancelado { background: #ffebee; color: #c62828; }
+
+.tipo-normal  { background: #e8f5e9; color: #2e7d32; }
+.tipo-urgente { background: #fff3cd; color: #c47f00; }
