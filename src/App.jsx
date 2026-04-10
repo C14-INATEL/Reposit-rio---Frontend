@@ -3,6 +3,8 @@ import Home from './pages/Home'
 import Login from './pages/Login'
 import Dashboard from './pages/Dashboard'
 import Cadastro from './pages/Cadastro'
+import LojistaDashboard from './pages/LojistaDashboard'
+import Rastreio from './pages/Rastreio'
 
 function App() {
   return (
@@ -12,7 +14,8 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/cadastro" element={<Cadastro />} />
-        <Route path="/rastrear" element={<div>Tela de rastreio - em breve</div>} />
+        <Route path="/rastrear" element={<Rastreio/>} />
+        <Route path="/lojista" element={<LojistaDashboard />} />
       </Routes>
     </BrowserRouter>
   )
