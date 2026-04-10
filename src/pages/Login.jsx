@@ -29,7 +29,19 @@ function Login() {
       sessionStorage.setItem('usuario', usuario)
       sessionStorage.setItem('tipo', mockUser.tipo)
       if (rememberMe) localStorage.setItem('usuarioSalvo', usuario)
-      navigate('/dashboard', { state: { usuario, tipo: mockUser.tipo } })
+      
+        if (mockUser.tipo === 'admin') {
+           navigate('/dashboard', { state: { usuario, tipo: mockUser.tipo } })
+        }
+
+        if (mockUser.tipo === 'operador') {
+          navigate('/operador', { state: { usuario, tipo: mockUser.tipo } })
+         }
+
+         if (mockUser.tipo === 'lojista') {
+          navigate('/lojista', { state: { usuario, tipo: mockUser.tipo } })
+         }
+         
       setCarregando(false)
       return
     }
