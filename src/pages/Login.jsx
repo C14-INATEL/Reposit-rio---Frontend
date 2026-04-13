@@ -35,7 +35,7 @@ function Login() {
         }
 
         if (mockUser.tipo === 'operador') {
-          navigate('/operador', { state: { usuario, tipo: mockUser.tipo } })
+          navigate('/dashboard', { state: { usuario, tipo: mockUser.tipo } })
          }
 
          if (mockUser.tipo === 'lojista') {
@@ -67,7 +67,11 @@ function Login() {
           localStorage.setItem('usuarioSalvo', usuario)
         }
         
-        navigate('/dashboard', { state: { usuario, tipo: data.tipo } })
+        if (data.tipo === 'lojista') {
+          navigate('/lojista', { state: { usuario, tipo: data.tipo } })
+        } else {
+          navigate('/dashboard', { state: { usuario, tipo: data.tipo } })
+        }
       } else {
         const data = await response.json()
         setErro(data.mensagem || 'Usuário ou senha incorretos.')
