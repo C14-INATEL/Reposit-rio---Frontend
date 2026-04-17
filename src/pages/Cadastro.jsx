@@ -56,12 +56,27 @@ function Cadastro() {
 
     setCarregando(true)
 
-    // Mock: simula cadastro bem-sucedido sem backend
-    setTimeout(() => {
-      setSucesso('Cadastro realizado com sucesso! Redirecionando...')
+    try {
+      const response = await fetch('http://localhost:3000/cadastro', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nome, email, senha, tipo }),
+      })
+
+      const data = await response.json()
+
+      if (response.ok) {
+        setSucesso('Cadastro realizado com sucesso! Redirecionando...')
+        setTimeout(() => navigate('/'), 2000)
+      } else {
+        setErro(data.mensagem || 'Erro ao realizar cadastro.')
+      }
+    } catch (err) {
+      setErro('Erro ao conectar com o servidor. Verifique se o backend está rodando.')
+      console.error('Erro de conexão:', err)
+    } finally {
       setCarregando(false)
-      setTimeout(() => navigate('/'), 2000)
-    }, 800)
+    }
   }
 
   const IconeOlho = ({ visivel }) => visivel ? (

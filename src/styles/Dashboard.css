@@ -325,3 +325,375 @@
 .tipo-admin    { background: #fce4ec; color: #c62828; }
 .tipo-operador { background: #fff8e1; color: #c47f00; }
 .tipo-lojista  { background: #e3f2fd; color: #1565c0; }
+
+/* SECTION HEADER com botão */
+.dash-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+.dash-section-header .dash-section-title {
+  margin-bottom: 0;
+}
+.dash-btn-novo {
+  background: linear-gradient(135deg, #f5c400, #f0a500);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 18px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: 'Segoe UI', sans-serif;
+  letter-spacing: 0.3px;
+  box-shadow: 0 3px 10px rgba(245, 196, 0, 0.35);
+  transition: opacity 0.2s, box-shadow 0.2s, transform 0.1s;
+}
+.dash-btn-novo:hover {
+  opacity: 0.92;
+  box-shadow: 0 5px 14px rgba(245, 196, 0, 0.45);
+}
+.dash-btn-novo:active { transform: scale(0.97); }
+
+/* FORMULÁRIO DE CADASTRO */
+.dash-form-box {
+  background: #fff;
+  border: 1px solid #ececec;
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 24px;
+}
+.dash-form-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 20px;
+}
+.dash-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.dash-form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.dash-form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.dash-form-label {
+  font-size: 0.83rem;
+  font-weight: 600;
+  color: #555;
+}
+.dash-form-input {
+  border: 1.5px solid #e8e8e8;
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 0.9rem;
+  color: #333;
+  outline: none;
+  background: #f7f7f7;
+  font-family: 'Segoe UI', sans-serif;
+  transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+  width: 100%;
+  box-sizing: border-box;
+}
+.dash-form-input:focus {
+  border-color: #f5c400;
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(245, 196, 0, 0.12);
+}
+.dash-form-btn {
+  align-self: flex-start;
+  background: linear-gradient(135deg, #f5c400, #f0a500);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 28px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: 'Segoe UI', sans-serif;
+  letter-spacing: 0.3px;
+  box-shadow: 0 3px 12px rgba(245, 196, 0, 0.35);
+  transition: opacity 0.2s, box-shadow 0.2s, transform 0.1s;
+}
+.dash-form-btn:hover:not(:disabled) {
+  opacity: 0.92;
+  box-shadow: 0 5px 16px rgba(245, 196, 0, 0.45);
+}
+.dash-form-btn:active:not(:disabled) { transform: scale(0.97); }
+.dash-form-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+.dash-form-erro   { color: #c62828; font-size: 0.85rem; margin: 0; }
+.dash-form-sucesso { color: #2e7d32; font-size: 0.85rem; margin: 0; }
+
+/* BOTÕES DE AÇÃO NA TABELA */
+.th-acoes { text-align: center; width: 90px; }
+.td-acoes { text-align: center; white-space: nowrap; }
+
+.btn-acao {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  background: transparent;
+  transition: background 0.18s, transform 0.15s, color 0.18s;
+  margin: 0 2px;
+}
+.btn-editar { color: #888; }
+.btn-editar:hover {
+  background: #fff8e1;
+  color: #c47f00;
+  transform: scale(1.15);
+}
+.btn-excluir { color: #bbb; }
+.btn-excluir:hover {
+  background: #fce4ec;
+  color: #c62828;
+  transform: scale(1.15);
+}
+
+/* MODAL */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeOverlay 0.18s ease;
+}
+@keyframes fadeOverlay {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.modal-box {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.18);
+  width: 100%;
+  max-width: 460px;
+  padding: 28px;
+  animation: slideModal 0.2s ease;
+}
+@keyframes slideModal {
+  from { opacity: 0; transform: translateY(-16px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0)     scale(1);    }
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+.modal-titulo {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #222;
+  margin: 0;
+}
+.modal-fechar {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #aaa;
+  display: flex;
+  align-items: center;
+  padding: 4px;
+  border-radius: 6px;
+  transition: background 0.15s, color 0.15s;
+}
+.modal-fechar:hover { background: #f5f5f5; color: #333; }
+
+.modal-mensagem {
+  font-size: 0.95rem;
+  color: #333;
+  margin: 0 0 6px;
+}
+.modal-aviso {
+  font-size: 0.82rem;
+  color: #999;
+  margin: 0 0 20px;
+}
+.modal-erro { color: #c62828; font-size: 0.85rem; margin: 0 0 12px; }
+
+.modal-form { display: flex; flex-direction: column; gap: 14px; }
+.modal-field { display: flex; flex-direction: column; gap: 5px; }
+.modal-label { font-size: 0.83rem; font-weight: 600; color: #555; }
+.modal-input {
+  border: 1.5px solid #e8e8e8;
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 0.9rem;
+  color: #333;
+  outline: none;
+  background: #f7f7f7;
+  font-family: 'Segoe UI', sans-serif;
+  transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+  width: 100%;
+  box-sizing: border-box;
+}
+.modal-input:focus {
+  border-color: #f5c400;
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(245, 196, 0, 0.12);
+}
+
+/* DROPDOWN CUSTOMIZADO */
+.ds-dropdown {
+  position: relative;
+  width: 100%;
+}
+
+.ds-trigger {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px 14px;
+  background: #f7f7f7;
+  border: 1.5px solid #e8e8e8;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-family: 'Segoe UI', sans-serif;
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+  box-sizing: border-box;
+}
+.ds-trigger:hover {
+  border-color: #d0d0d0;
+  background: #f0f0f0;
+}
+.ds-trigger.ds-aberto {
+  border-color: #f5c400;
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(245, 196, 0, 0.12);
+}
+
+.ds-valor {
+  flex: 1;
+  color: #333;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ds-trigger.ds-vazio .ds-valor { color: #bbb; }
+
+.ds-seta {
+  display: flex;
+  align-items: center;
+  color: #aaa;
+  flex-shrink: 0;
+  transition: transform 0.2s, color 0.2s;
+}
+.ds-seta.ds-seta-aberta {
+  transform: rotate(180deg);
+  color: #f0a500;
+}
+
+.ds-lista {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  background: #fff;
+  border: 1.5px solid #e8e8e8;
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.10);
+  list-style: none;
+  padding: 6px;
+  margin: 0;
+  z-index: 200;
+  animation: dropdownFadeIn 0.15s ease;
+}
+@keyframes dropdownFadeIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.ds-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-family: 'Segoe UI', sans-serif;
+  color: #333;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.ds-item:hover { background: #fff8e1; color: #c47f00; }
+.ds-item.ds-selecionado {
+  background: linear-gradient(135deg, #f5c400, #f0a500);
+  color: #fff;
+  font-weight: 600;
+}
+.ds-item.ds-selecionado svg { stroke: #fff; }
+
+.modal-acoes {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 6px;
+}
+.modal-btn-cancelar {
+  background: #f5f5f5;
+  color: #555;
+  border: none;
+  border-radius: 8px;
+  padding: 9px 22px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.modal-btn-cancelar:hover { background: #ebebeb; }
+
+.modal-btn-excluir {
+  background: #c62828;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 9px 22px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.modal-btn-excluir:hover { background: #b71c1c; }
+
+.modal-btn-salvar {
+  background: linear-gradient(135deg, #f5c400, #f0a500);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 9px 22px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: 'Segoe UI', sans-serif;
+  letter-spacing: 0.3px;
+  box-shadow: 0 3px 10px rgba(245, 196, 0, 0.3);
+  transition: opacity 0.2s, box-shadow 0.2s, transform 0.1s;
+}
+.modal-btn-salvar:hover:not(:disabled) {
+  opacity: 0.92;
+  box-shadow: 0 5px 14px rgba(245, 196, 0, 0.45);
+}
+.modal-btn-salvar:active:not(:disabled) { transform: scale(0.97); }
+.modal-btn-salvar:disabled { opacity: 0.6; cursor: not-allowed; }
