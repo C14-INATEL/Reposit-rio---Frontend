@@ -1,16 +1,54 @@
-# React + Vite
+Frontend Repositório - Instalação e Execução
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Este repositório contém o front-end em React + Vite para o projeto.
 
-Currently, two official plugins are available:
+Requisitos
+- Node.js >= 20
+- npm >= 9
+- Git
+- (Opcional) Docker + Docker Compose
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+1) Clonar o repositorio
 
-## React Compiler
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+git clone https://github.com/C14-INATEL/Reposit-rio---Frontend.git
+cd Reposit-rio---Frontend
 
-## Expanding the ESLint configuration
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+2) Instalar dependencias
+
+
+npm install
+
+
+3) Rodar em desenvolvimento
+
+
+npm run dev
+
+
+A aplicação ficará disponível em `http://localhost:5173`.
+
+4) Build de produto
+
+
+npm run build
+
+
+6) Variaveis de ambiente
+
+Se usar arquivo `.env` (a aplicação pode precisar de `VITE_API_URL`):
+
+
+VITE_API_URL=http://localhost:3000
+
+
+7) Rodar com Docker Compose (opcional)
+
+No diretório raiz do `DUCK` (onde estão `docker-compose.yml`):
+
+docker compose up -d --build
+
+Acesse:
+- Frontend: `http://localhost:5173`
+- Backend: `http://localhost:3000`

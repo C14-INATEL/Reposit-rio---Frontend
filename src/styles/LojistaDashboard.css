@@ -1,0 +1,631 @@
+/* (baseado 100% no Admin + funcionalidades lojista) */
+
+/* DASHBOARD - Duck Centro de Distribuição - LOJISTA */
+
+.dashboard-container {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  font-family: 'Segoe UI', sans-serif;
+  background: #f5f6fa;
+  overflow: hidden;
+}
+
+/* HEADER */
+.dashboard-header {
+  width: 100%;
+  background: linear-gradient(135deg, #f5c400, #f0a500);
+  padding: 0 40px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 2px 12px rgba(245, 196, 0, 0.3);
+  flex-shrink: 0;
+  z-index: 10;
+}
+
+.dashboard-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.dashboard-logo-img {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+}
+
+.dashboard-logo-name {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: white;
+  letter-spacing: -0.5px;
+}
+
+.dashboard-welcome-text {
+  font-size: 1rem;
+  color: white;
+  font-weight: 400;
+}
+
+.dashboard-welcome-text strong {
+  font-weight: 700;
+}
+
+.dashboard-user {
+  display: flex;
+  align-items: center;
+}
+
+.dashboard-logout-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: rgba(255, 255, 255, 0.2);
+  border: 1.5px solid rgba(255, 255, 255, 0.5);
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: white;
+  cursor: pointer;
+  font-family: 'Segoe UI', sans-serif;
+  transition: background 0.2s;
+}
+
+.dashboard-logout-btn:hover {
+  background: rgba(255, 255, 255, 0.35);
+}
+
+/* BODY (sidebar + main) */
+.dashboard-body {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* SIDEBAR */
+.dash-sidebar {
+  width: 240px;
+  background: #ffffff;
+  border-right: 1px solid #ebebeb;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  transition: width 0.25s ease;
+  overflow: hidden;
+}
+
+.dash-sidebar.recolhida {
+  width: 68px;
+}
+
+/* Botão de toggle */
+.dash-sidebar-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding-left: 24px;
+  width: 100%;
+  height: 52px;
+  background: none;
+  border: none;
+  border-bottom: 1px solid #f0f0f0;
+  color: #888;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.2s, color 0.2s;
+}
+
+.dash-sidebar-toggle:hover {
+  background: #fff8e1;
+  color: #f0a500;
+}
+
+/* Navegação */
+.dash-nav {
+  display: flex;
+  flex-direction: column;
+  padding: 12px 8px;
+  gap: 4px;
+}
+
+.dash-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 12px;
+  border: none;
+  border-radius: 10px;
+  background: none;
+  color: #666;
+  font-size: 0.9rem;
+  font-family: 'Segoe UI', sans-serif;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  text-align: left;
+  transition: background 0.18s, color 0.18s;
+  width: 100%;
+}
+
+.dash-nav-item:hover {
+  background: #fff8e1;
+  color: #c47f00;
+}
+
+.dash-nav-item.ativo {
+  background: linear-gradient(135deg, #f5c400, #f0a500);
+  color: white;
+  font-weight: 600;
+}
+
+.dash-nav-icone {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.dash-nav-label {
+  overflow: hidden;
+}
+
+/* MAIN */
+.dashboard-main {
+  flex: 1;
+  overflow-y: auto;
+  padding: 32px;
+}
+
+/* SEÇÃO */
+.dash-section {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.dash-section-title {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+/* CARDS */
+.dash-cards {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+.dash-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 20px 22px;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid #f0f0f0;
+}
+
+.dash-card-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.dash-card-value {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #1a1a1a;
+  line-height: 1;
+}
+
+.dash-card-icon {
+  position: absolute;
+  right: 18px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Cores dos cards - LOJISTA */
+.card-value-pendente { color: #c47f00; }
+.card-value-emrota { color: #f0a500; }
+.card-value-entregue { color: #2e7d32; }
+
+.card-icon-total { background: #f5f6fa; color: #888; }
+.card-icon-pendente { background: #fff8e1; color: #c47f00; }
+.card-icon-emrota { background: #fff3cd; color: #f0a500; }
+.card-icon-entregue { background: #e8f5e9; color: #2e7d32; }
+
+/* TABELA */
+.dash-table-box {
+  background: #fff;
+  border-radius: 14px;
+  border: 1px solid #f0f0f0;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+}
+
+.dash-table-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+/* Header da tabela com botão */
+.dash-table-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 22px 14px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.dash-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.dash-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.dash-table thead tr {
+  background: #fafafa;
+}
+
+.dash-table th {
+  text-align: left;
+  padding: 12px 18px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #999;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.dash-table td {
+  padding: 13px 18px;
+  color: #333;
+  border-bottom: 1px solid #f7f7f7;
+}
+
+.dash-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.dash-table tbody tr:hover td {
+  background: #fafafa;
+}
+
+.td-id { color: #bbb; font-weight: 600; font-size: 0.82rem; }
+.td-data { color: #999; font-size: 0.85rem; }
+
+/* BADGES */
+.badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+}
+
+/* Status badges - LOJISTA */
+.status-pendente { background: #fff8e1; color: #c47f00; }
+.status-emrota { background: #fff3cd; color: #f0a500; }
+.status-entregue { background: #e8f5e9; color: #2e7d32; }
+.status-cancelado { background: #ffebee; color: #c62828; }
+
+/* Tipo badges */
+.tipo-normal { background: #e8f5e9; color: #2e7d32; }
+.tipo-urgente { background: #fff3cd; color: #c47f00; }
+
+/* BOTÕES LOJISTA */
+.dash-btn-novo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: linear-gradient(135deg, #f5c400, #f0a500);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.dash-btn-novo:hover {
+  opacity: 0.9;
+}
+
+/* Ações da tabela */
+.acoes {
+  display: flex;
+  gap: 6px;
+}
+
+.btn-editar, .btn-cancelar {
+  padding: 4px 10px;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.btn-editar {
+  background: #e3f2fd;
+  color: #1565c0;
+}
+
+.btn-editar:hover {
+  opacity: 0.8;
+}
+
+.btn-cancelar {
+  background: #ffebee;
+  color: #c62828;
+}
+
+.btn-cancelar:hover {
+  opacity: 0.8;
+}
+
+/* FORMULÁRIO SIDEBAR */
+.form-overlay {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 380px;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.form-sidebar {
+  width: 100%;
+  max-width: 380px;
+  height: 100vh;
+  background: white;
+  box-shadow: -4px 0 20px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.form-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px 24px 0;
+  border-bottom: 1px solid #f0f0f0;
+  flex-shrink: 0;
+}
+
+.form-header h3 {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+.form-close {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: #999;
+  cursor: pointer;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.form-close:hover {
+  background: #f5f5f5;
+  color: #666;
+}
+
+.form-body {
+  flex: 1;
+  padding: 24px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.form-body label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #555;
+  margin-bottom: 4px;
+}
+
+.form-body input,
+.form-body select {
+  padding: 12px 14px;
+  border: 1.5px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  transition: border-color 0.2s;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.form-body input:focus,
+.form-body select:focus {
+  outline: none;
+  border-color: #f5c400;
+}
+
+.custo-preview {
+  padding: 12px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  font-size: 1rem;
+  color: #333;
+  text-align: center;
+}
+
+.form-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.btn-primary {
+  flex: 1;
+  padding: 12px;
+  background: linear-gradient(135deg, #f5c400, #f0a500);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.btn-primary:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-secondary {
+  flex: 1;
+  padding: 12px;
+  background: #f5f5f5;
+  color: #666;
+  border: 1.5px solid #e0e0e0;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-secondary:hover {
+  background: #e8e8e8;
+  border-color: #ccc;
+}
+
+/* RESPONSIVO */
+@media (max-width: 1200px) {
+  .dash-cards {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-header {
+    padding: 0 20px;
+  }
+  
+  .dashboard-main {
+    padding: 20px 16px;
+  }
+  
+  .dash-cards {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  
+  .form-overlay {
+    width: 100%;
+  }
+  
+  .form-sidebar {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .dash-table-header,
+  .dash-section-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+  
+  .dash-btn-novo {
+    justify-content: center;
+  }
+}
+
+
+.td-rastreio {
+  font-size: 0.85rem;
+}
+
+.rastreio-cell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-copiar {
+  background: #f0f0f0;
+  border: none;
+  border-radius: 6px;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 0.9rem;
+}
+
+.btn-copiar:hover {
+  background: #f5c400;
+  color: white;
+  transform: scale(1.1);
+}
+
+/* Responsivo */
+@media (max-width: 768px) {
+  .td-rastreio {
+    font-size: 0.8rem;
+  }
+  
+  .btn-copiar {
+    width: 24px;
+    height: 24px;
+    font-size: 0.8rem;
+  }
+}
