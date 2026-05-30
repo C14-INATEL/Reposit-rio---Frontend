@@ -12,7 +12,7 @@ pipeline {
             }
         }
 
-        stage('Instalar dependências') {
+        stage('Instalar dependencias') {
             steps {
                 sh 'npm install'
             }
@@ -29,14 +29,23 @@ pipeline {
                 sh 'npm run build'
             }
         }
+
+        stage('Deploy') {
+            steps {
+                sh 'docker build -t c214-frontend .'
+                sh 'docker stop frontend || true'
+                sh 'docker rm frontend || true'
+                sh 'docker run -d --name frontend -p 5173:5173 c214-frontend'
+            }
+        }
     }
 
     post {
         success {
-            echo '✅ Testes e build passaram com sucesso!'
+            echo 'Testes e deploy concluidos com sucesso!'
         }
         failure {
-            echo '❌ Algo falhou. Verifique os logs acima.'
+            echo 'Algum passo falhou. Verifique os logs acima.'
         }
     }
 }
