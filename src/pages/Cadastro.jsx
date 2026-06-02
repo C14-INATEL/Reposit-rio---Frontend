@@ -74,8 +74,8 @@ function Cadastro() {
       })
 
       if (response.ok) {
-        setSucesso('Cadastro realizado com sucesso! Redirecionando...')
-        setTimeout(() => navigate('/'), 2000)
+        setSucesso('Cadastro realizado com sucesso! Redirecionando para login...')
+        setTimeout(() => navigate('/login'), 2000)
       } else {
         const data = await response.json()
         setErro(data.mensagem || 'Erro ao realizar cadastro.')
