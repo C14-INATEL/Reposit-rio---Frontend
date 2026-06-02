@@ -47,7 +47,10 @@ function Login() {
     }
 
     try {
-      const response = await fetch('http://localhost:3000/login', {
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000'
+      console.log('Tentando conectar em:', `${apiUrl}/login`)
+      
+      const response = await fetch(`${apiUrl}/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -77,8 +80,9 @@ function Login() {
         setErro(data.mensagem || 'Usuário ou senha incorretos.')
       }
     } catch (err) {
-      setErro('Erro ao conectar com o servidor. Verifique se o backend está rodando.')
-      console.error('Erro de conexão:', err)
+      console.error('Erro completo:', err)
+      console.error('Tipo de erro:', err.name)
+      console.error('Mensagem:', err.message)
     } finally {
       setCarregando(false)
     }

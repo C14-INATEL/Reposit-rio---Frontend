@@ -56,12 +56,37 @@ function Cadastro() {
 
     setCarregando(true)
 
-    // Mock: simula cadastro bem-sucedido sem backend
-    setTimeout(() => {
-      setSucesso('Cadastro realizado com sucesso! Redirecionando...')
+    try {
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000'
+      console.log('Tentando conectar em:', `${apiUrl}/cadastro`)
+      
+      const response = await fetch(`${apiUrl}/cadastro`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          nome,
+          email,
+          senha,
+          tipo,
+        }),
+      })
+
+      if (response.ok) {
+        setSucesso('Cadastro realizado com sucesso! Redirecionando...')
+        setTimeout(() => navigate('/'), 2000)
+      } else {
+        const data = await response.json()
+        setErro(data.mensagem || 'Erro ao realizar cadastro.')
+      }
+    } catch (err) {
+      console.error('Erro completo:', err)
+      console.error('Tipo de erro:', err.name)
+      console.error('Mensagem:', err.message)
+    } finally {
       setCarregando(false)
-      setTimeout(() => navigate('/'), 2000)
-    }, 800)
+    }
   }
 
   const IconeOlho = ({ visivel }) => visivel ? (
