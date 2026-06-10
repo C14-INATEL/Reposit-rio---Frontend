@@ -6,52 +6,89 @@ function Login() {
   const navigate = useNavigate()
   const [showPassword, setShowPassword] = useState(false)
   const [rememberMe, setRememberMe] = useState(false)
-  const [email, setEmail] = useState('')
+  const [usuario, setUsuario] = useState('')
   const [senha, setSenha] = useState('')
   const [erro, setErro] = useState('')
   const [carregando, setCarregando] = useState(false)
+
+  // Usuários mock para navegação sem backend
+  const MOCK_USERS = [
+    { usuario: 'admin', senha: '1234', tipo: 'admin' },
+    { usuario: 'operador', senha: '1234', tipo: 'operador' },
+    { usuario: 'lojista', senha: '1234', tipo: 'lojista' },
+  ]
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     setErro('')
     setCarregando(true)
 
+    // Verifica mock antes de chamar o backend
+    const mockUser = MOCK_USERS.find(u => u.usuario === usuario && u.senha === senha)
+    if (mockUser) {
+      sessionStorage.setItem('usuario', usuario)
+      sessionStorage.setItem('tipo', mockUser.tipo)
+      if (rememberMe) localStorage.setItem('usuarioSalvo', usuario)
+      
+        if (mockUser.tipo === 'admin') {
+           navigate('/dashboard', { state: { usuario, tipo: mockUser.tipo } })
+        }
+
+        if (mockUser.tipo === 'operador') {
+          navigate('/dashboard', { state: { usuario, tipo: mockUser.tipo } })
+         }
+
+         if (mockUser.tipo === 'lojista') {
+          navigate('/lojista', { state: { usuario, tipo: mockUser.tipo } })
+         }
+         
+      setCarregando(false)
+      return
+    }
+
     try {
       const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000'
+      console.log('Tentando conectar em:', `${apiUrl}/login`)
+
+      // Detecta se o campo é email ou nome de usuário
+      const isEmail = usuario.includes('@')
+      const body = isEmail
+        ? { email: usuario, senha }
+        : { usuario, senha }
       
       const response = await fetch(`${apiUrl}/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email, senha }),
+        body: JSON.stringify(body),
       })
 
       if (response.ok) {
         const data = await response.json()
         
         // Armazenar dados do usuário na sessão
-        sessionStorage.setItem('email', email)
-        sessionStorage.setItem('usuario', data.usuario?.nome || email)
+        sessionStorage.setItem('usuario', usuario)
         sessionStorage.setItem('tipo', data.tipo)
         
         // Se "Lembrar-me" estiver ativo salva as informações no localStorage
         if (rememberMe) {
-          localStorage.setItem('emailSalvo', email)
+          localStorage.setItem('usuarioSalvo', usuario)
         }
         
         if (data.tipo === 'lojista') {
-          navigate('/lojista', { state: { email, tipo: data.tipo } })
+          navigate('/lojista', { state: { usuario, tipo: data.tipo } })
         } else {
-          navigate('/dashboard', { state: { email, tipo: data.tipo } })
+          navigate('/dashboard', { state: { usuario, tipo: data.tipo } })
         }
       } else {
         const data = await response.json()
-        setErro(data.mensagem || 'Email ou senha incorretos.')
+        setErro(data.mensagem || 'Usuário ou senha incorretos.')
       }
     } catch (err) {
-      setErro('Erro ao conectar com o servidor. Verifique se o backend está rodando.')
-      console.error('Erro de conexão:', err)
+      console.error('Erro completo:', err)
+      console.error('Tipo de erro:', err.name)
+      console.error('Mensagem:', err.message)
     } finally {
       setCarregando(false)
     }
@@ -91,22 +128,22 @@ function Login() {
           <p className="login-subtitle">Acesse sua conta para continuar</p>
 
           <form className="login-form" onSubmit={handleSubmit}>
-            {/* Campo Email */}
+            {/* Campo Usuário */}
             <div className="login-field">
-              <label className="login-label">Email</label>
+              <label className="login-label">Usuário ou E-mail</label>
               <div className="login-input-wrapper">
                 <span className="login-input-icon">
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#aaa" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
-                    <polyline points="22,6 12,13 2,6"/>
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                    <circle cx="12" cy="7" r="4"/>
                   </svg>
                 </span>
                 <input
-                  type="email"
+                  type="text"
                   className="login-input"
-                  placeholder="Digite seu email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Digite seu usuário ou e-mail"
+                  value={usuario}
+                  onChange={(e) => setUsuario(e.target.value)}
                   required
                 />
               </div>
