@@ -12,6 +12,9 @@ dist
 dist-ssr
 *.local
 
+# Test reports (gerados pelo Jenkins)
+test-results
+
 # Environment variables
 .env
 .env.local
