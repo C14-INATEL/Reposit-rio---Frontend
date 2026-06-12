@@ -27,31 +27,64 @@ describe('Tela de Login', () => {
   it('renderiza os campos de usuário, senha e botão de entrar', () => {
     renderLogin()
 
-    expect(screen.getByPlaceholderText('Digite seu usuário')).toBeInTheDocument()
+    expect(screen.getByPlaceholderText(/Digite seu usuário/i)).toBeInTheDocument()
     expect(screen.getByPlaceholderText('Digite sua senha')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /entrar/i })).toBeInTheDocument()
   })
 
-  it('navega para o dashboard ao usar credenciais mock válidas', async () => {
+  it('navega para o dashboard quando o backend autentica um admin', async () => {
+    global.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ mensagem: 'Login realizado com sucesso', tipo: 'admin' }),
+    })
+
     renderLogin()
 
-    fireEvent.change(screen.getByPlaceholderText('Digite seu usuário'), {
-      target: { value: 'admin' },
+    fireEvent.change(screen.getByPlaceholderText(/Digite seu usuário/i), {
+      target: { value: 'admin@email.com' },
     })
     fireEvent.change(screen.getByPlaceholderText('Digite sua senha'), {
-      target: { value: '1234' },
+      target: { value: '123456' },
     })
     fireEvent.click(screen.getByRole('button', { name: /entrar/i }))
 
     await waitFor(() => {
       expect(mockNavigate).toHaveBeenCalledWith(
         '/dashboard',
-        expect.objectContaining({ state: expect.objectContaining({ usuario: 'admin' }) })
+        expect.objectContaining({
+          state: expect.objectContaining({ usuario: 'admin@email.com', tipo: 'admin' }),
+        })
       )
     })
   })
 
-  it('exibe mensagem de erro ao usar credenciais inválidas sem backend', async () => {
+  it('navega para a tela de lojista quando o backend autentica um lojista', async () => {
+    global.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ mensagem: 'Login realizado com sucesso', tipo: 'lojista' }),
+    })
+
+    renderLogin()
+
+    fireEvent.change(screen.getByPlaceholderText(/Digite seu usuário/i), {
+      target: { value: 'ana.santos@email.com' },
+    })
+    fireEvent.change(screen.getByPlaceholderText('Digite sua senha'), {
+      target: { value: '123456' },
+    })
+    fireEvent.click(screen.getByRole('button', { name: /entrar/i }))
+
+    await waitFor(() => {
+      expect(mockNavigate).toHaveBeenCalledWith(
+        '/lojista',
+        expect.objectContaining({
+          state: expect.objectContaining({ usuario: 'ana.santos@email.com', tipo: 'lojista' }),
+        })
+      )
+    })
+  })
+
+  it('exibe mensagem de erro quando o backend rejeita as credenciais', async () => {
     global.fetch = vi.fn().mockResolvedValue({
       ok: false,
       json: async () => ({ mensagem: 'Usuário ou senha incorretos.' }),
@@ -59,7 +92,7 @@ describe('Tela de Login', () => {
 
     renderLogin()
 
-    fireEvent.change(screen.getByPlaceholderText('Digite seu usuário'), {
+    fireEvent.change(screen.getByPlaceholderText(/Digite seu usuário/i), {
       target: { value: 'errado' },
     })
     fireEvent.change(screen.getByPlaceholderText('Digite sua senha'), {

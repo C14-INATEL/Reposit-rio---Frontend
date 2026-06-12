@@ -1,48 +1,20 @@
 import { useNavigate, useLocation } from 'react-router-dom'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
+import { api } from '../api/api'
 import '../styles/Dashboard.css'
 
-// dados mockados apenas para visualização
-const resumo = {
-  totalPedidos: 24,
-  emAndamento: 8,
-  entregues: 13,
-  totalLojas: 2,
-}
-
-const pedidosMock = [
-  { id: 1, loja: 'Loja A', regiao: 'Sul', status: 2, data: '05/04/2026' },
-  { id: 2, loja: 'Loja B', regiao: 'Sudeste', status: 4, data: '04/04/2026' },
-  { id: 3, loja: 'Loja A', regiao: 'Sul', status: 1, data: '04/04/2026' },
-  { id: 4, loja: 'Loja B', regiao: 'Norte', status: 3, data: '03/04/2026' },
-  { id: 5, loja: 'Loja A', regiao: 'Centro-Oeste', status: 4, data: '02/04/2026' },
-  { id: 6, loja: 'Loja B', regiao: 'Sudeste', status: 2, data: '01/04/2026' },
-]
-
-const usuariosMock = [
-  { id: 1, nome: 'Administrador', email: 'admin@email.com', tipo: 'admin' },
-  { id: 2, nome: 'Operador 1', email: 'op1@email.com', tipo: 'operador' },
-  { id: 3, nome: 'Operador 2', email: 'op2@email.com', tipo: 'operador' },
-  { id: 4, nome: 'Loja A', email: 'A@email.com', tipo: 'lojista' },
-  { id: 5, nome: 'Loja B', email: 'B@email.com', tipo: 'lojista' },
-]
-
-const lojasMock = [
-  { id: 1, nome: 'Loja A', endereco: 'Rua ABC, 100', telefone: '111111111' },
-  { id: 2, nome: 'Loja B', endereco: 'Rua DEF, 200', telefone: '222222222' },
-]
-
 const statusConfig = {
-  1: { label: 'Criado', classe: 'status-criado' },
-  2: { label: 'Em andamento', classe: 'status-andamento' },
-  3: { label: 'Enviado', classe: 'status-enviado' },
-  4: { label: 'Entregue', classe: 'status-entregue' },
+  criado:    { label: 'Criado',       classe: 'status-criado' },
+  andamento: { label: 'Em andamento', classe: 'status-andamento' },
+  enviado:   { label: 'Enviado',      classe: 'status-enviado' },
+  entregue:  { label: 'Entregue',     classe: 'status-entregue' },
+  cancelado: { label: 'Cancelado',    classe: 'status-cancelado' },
 }
 
 const tipoConfig = {
-  admin: { label: 'Admin', classe: 'tipo-admin' },
+  admin:    { label: 'Admin',    classe: 'tipo-admin' },
   operador: { label: 'Operador', classe: 'tipo-operador' },
-  lojista: { label: 'Lojista', classe: 'tipo-lojista' },
+  lojista:  { label: 'Lojista',  classe: 'tipo-lojista' },
 }
 
 const navItems = [
@@ -51,6 +23,17 @@ const navItems = [
   { id: 'usuarios', label: 'Usuários' },
   { id: 'lojas', label: 'Lojas' },
 ]
+
+function formatarData(iso) {
+  if (!iso) return '-'
+  const d = new Date(iso)
+  if (isNaN(d.getTime())) return '-'
+  return d.toLocaleDateString('pt-BR')
+}
+
+function statusVisual(status) {
+  return statusConfig[status] || { label: status, classe: '' }
+}
 
 // icones SVG
 function IcHome() {
@@ -121,7 +104,7 @@ function getIcone(id) {
   return null
 }
 
-function VisaoGeral() {
+function VisaoGeral({ resumo, entregas }) {
   return (
     <div className="dash-section">
       <h2 className="dash-section-title">Visão Geral</h2>
@@ -170,19 +153,23 @@ function VisaoGeral() {
             </tr>
           </thead>
           <tbody>
-            {pedidosMock.map(p => (
-              <tr key={p.id}>
-                <td className="td-id">#{p.id}</td>
-                <td>{p.loja}</td>
-                <td>{p.regiao}</td>
-                <td>
-                  <span className={`badge ${statusConfig[p.status].classe}`}>
-                    {statusConfig[p.status].label}
-                  </span>
-                </td>
-                <td className="td-data">{p.data}</td>
-              </tr>
-            ))}
+            {entregas.slice(0, 8).map(p => {
+              const sv = statusVisual(p.status)
+              return (
+                <tr key={p.id}>
+                  <td className="td-id">#{p.id}</td>
+                  <td>{p.loja_nome}</td>
+                  <td>{p.regiao_nome}</td>
+                  <td>
+                    <span className={`badge ${sv.classe}`}>{sv.label}</span>
+                  </td>
+                  <td className="td-data">{formatarData(p.data_pedido)}</td>
+                </tr>
+              )
+            })}
+            {entregas.length === 0 && (
+              <tr><td colSpan="5" style={{ textAlign: 'center', padding: 24, color: '#888' }}>Nenhum pedido cadastrado.</td></tr>
+            )}
           </tbody>
         </table>
       </div>
@@ -190,7 +177,7 @@ function VisaoGeral() {
   )
 }
 
-function Pedidos() {
+function Pedidos({ entregas }) {
   return (
     <div className="dash-section">
       <h2 className="dash-section-title">Pedidos</h2>
@@ -201,24 +188,32 @@ function Pedidos() {
               <th>#</th>
               <th>Loja</th>
               <th>Região</th>
+              <th>Prioridade</th>
               <th>Status</th>
+              <th>Custo</th>
               <th>Data</th>
             </tr>
           </thead>
           <tbody>
-            {pedidosMock.map(p => (
-              <tr key={p.id}>
-                <td className="td-id">#{p.id}</td>
-                <td>{p.loja}</td>
-                <td>{p.regiao}</td>
-                <td>
-                  <span className={`badge ${statusConfig[p.status].classe}`}>
-                    {statusConfig[p.status].label}
-                  </span>
-                </td>
-                <td className="td-data">{p.data}</td>
-              </tr>
-            ))}
+            {entregas.map(p => {
+              const sv = statusVisual(p.status)
+              return (
+                <tr key={p.id}>
+                  <td className="td-id">#{p.id}</td>
+                  <td>{p.loja_nome}</td>
+                  <td>{p.regiao_nome}</td>
+                  <td>{p.prioridade}</td>
+                  <td>
+                    <span className={`badge ${sv.classe}`}>{sv.label}</span>
+                  </td>
+                  <td>R$ {Number(p.custo || 0).toFixed(2)}</td>
+                  <td className="td-data">{formatarData(p.data_pedido)}</td>
+                </tr>
+              )
+            })}
+            {entregas.length === 0 && (
+              <tr><td colSpan="7" style={{ textAlign: 'center', padding: 24, color: '#888' }}>Nenhum pedido cadastrado.</td></tr>
+            )}
           </tbody>
         </table>
       </div>
@@ -226,7 +221,7 @@ function Pedidos() {
   )
 }
 
-function Usuarios() {
+function Usuarios({ usuarios }) {
   return (
     <div className="dash-section">
       <h2 className="dash-section-title">Usuários</h2>
@@ -241,18 +236,22 @@ function Usuarios() {
             </tr>
           </thead>
           <tbody>
-            {usuariosMock.map(u => (
-              <tr key={u.id}>
-                <td className="td-id">#{u.id}</td>
-                <td>{u.nome}</td>
-                <td className="td-email">{u.email}</td>
-                <td>
-                  <span className={`badge ${tipoConfig[u.tipo].classe}`}>
-                    {tipoConfig[u.tipo].label}
-                  </span>
-                </td>
-              </tr>
-            ))}
+            {usuarios.map(u => {
+              const tv = tipoConfig[u.tipo] || { label: u.tipo, classe: '' }
+              return (
+                <tr key={u.id}>
+                  <td className="td-id">#{u.id}</td>
+                  <td>{u.nome}</td>
+                  <td className="td-email">{u.email}</td>
+                  <td>
+                    <span className={`badge ${tv.classe}`}>{tv.label}</span>
+                  </td>
+                </tr>
+              )
+            })}
+            {usuarios.length === 0 && (
+              <tr><td colSpan="4" style={{ textAlign: 'center', padding: 24, color: '#888' }}>Nenhum usuário.</td></tr>
+            )}
           </tbody>
         </table>
       </div>
@@ -260,7 +259,7 @@ function Usuarios() {
   )
 }
 
-function Lojas() {
+function Lojas({ lojas }) {
   return (
     <div className="dash-section">
       <h2 className="dash-section-title">Lojas</h2>
@@ -272,17 +271,22 @@ function Lojas() {
               <th>Nome</th>
               <th>Endereço</th>
               <th>Telefone</th>
+              <th>Lojista</th>
             </tr>
           </thead>
           <tbody>
-            {lojasMock.map(l => (
+            {lojas.map(l => (
               <tr key={l.id}>
                 <td className="td-id">#{l.id}</td>
                 <td>{l.nome}</td>
                 <td>{l.endereco}</td>
                 <td>{l.telefone}</td>
+                <td>{l.lojista || '-'}</td>
               </tr>
             ))}
+            {lojas.length === 0 && (
+              <tr><td colSpan="5" style={{ textAlign: 'center', padding: 24, color: '#888' }}>Nenhuma loja.</td></tr>
+            )}
           </tbody>
         </table>
       </div>
@@ -299,6 +303,11 @@ function Dashboard() {
 
   const [secao, setSecao] = useState('visao-geral')
   const [recolhida, setRecolhida] = useState(false)
+  const [entregas, setEntregas] = useState([])
+  const [usuarios, setUsuarios] = useState([])
+  const [lojas, setLojas] = useState([])
+  const [carregando, setCarregando] = useState(true)
+  const [erroCarregamento, setErroCarregamento] = useState('')
 
   useEffect(() => {
     if (!sessionStorage.getItem('usuario')) {
@@ -306,17 +315,58 @@ function Dashboard() {
     }
   }, [navigate])
 
+  useEffect(() => {
+    let cancelado = false
+    setCarregando(true)
+    setErroCarregamento('')
+
+    Promise.all([api.get('/entregas'), api.get('/usuarios'), api.get('/lojas')])
+      .then(([e, u, l]) => {
+        if (cancelado) return
+        setEntregas(Array.isArray(e) ? e : [])
+        setUsuarios(Array.isArray(u) ? u : [])
+        setLojas(Array.isArray(l) ? l : [])
+      })
+      .catch(err => {
+        console.error('Erro ao carregar dashboard:', err)
+        if (!cancelado) setErroCarregamento(err.message || 'Erro ao carregar dados.')
+      })
+      .finally(() => {
+        if (!cancelado) setCarregando(false)
+      })
+
+    return () => { cancelado = true }
+  }, [])
+
+  const resumo = useMemo(() => ({
+    totalPedidos: entregas.length,
+    emAndamento: entregas.filter(e => e.status === 'andamento' || e.status === 'enviado').length,
+    entregues: entregas.filter(e => e.status === 'entregue').length,
+    totalLojas: lojas.length,
+  }), [entregas, lojas])
+
   const handleLogout = () => {
-    sessionStorage.removeItem('usuario')
-    sessionStorage.removeItem('tipo')
+    sessionStorage.clear()
     navigate('/')
   }
 
   const renderConteudo = () => {
-    if (secao === 'visao-geral') return <VisaoGeral />
-    if (secao === 'pedidos') return <Pedidos />
-    if (secao === 'usuarios') return <Usuarios />
-    if (secao === 'lojas') return <Lojas />
+    if (carregando) {
+      return <div className="dash-section"><p style={{ padding: 24 }}>Carregando...</p></div>
+    }
+    if (erroCarregamento) {
+      return (
+        <div className="dash-section">
+          <p style={{ padding: 24, color: '#c62828' }}>
+            {erroCarregamento} — verifique se o backend está rodando em <code>http://localhost:3000</code>.
+          </p>
+        </div>
+      )
+    }
+    if (secao === 'visao-geral') return <VisaoGeral resumo={resumo} entregas={entregas} />
+    if (secao === 'pedidos') return <Pedidos entregas={entregas} />
+    if (secao === 'usuarios') return <Usuarios usuarios={usuarios} />
+    if (secao === 'lojas') return <Lojas lojas={lojas} />
   }
 
   return (
