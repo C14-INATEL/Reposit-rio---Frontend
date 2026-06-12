@@ -221,10 +221,286 @@ function Pedidos({ entregas }) {
   )
 }
 
-function Usuarios({ usuarios }) {
+// Ícones para ações
+function IcEdit() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+    </svg>
+  )
+}
+
+function IcDelete() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="3 6 5 6 21 6"/>
+      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+      <line x1="10" y1="11" x2="10" y2="17"/>
+      <line x1="14" y1="11" x2="14" y2="17"/>
+    </svg>
+  )
+}
+
+function IcPlus() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="12" y1="5" x2="12" y2="19"/>
+      <line x1="5" y1="12" x2="19" y2="12"/>
+    </svg>
+  )
+}
+
+function IcClose() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="18" y1="6" x2="6" y2="18"/>
+      <line x1="6" y1="6" x2="18" y2="18"/>
+    </svg>
+  )
+}
+
+function IcEye() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+      <circle cx="12" cy="12" r="3"/>
+    </svg>
+  )
+}
+
+function IcEyeOff() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+      <line x1="1" y1="1" x2="23" y2="23"/>
+    </svg>
+  )
+}
+
+// Modal de Criar/Editar Usuário
+function ModalUsuario({ isOpen, modo, usuario, onClose, onSave, carregando }) {
+  const [form, setForm] = useState({
+    nome: usuario?.nome || '',
+    email: usuario?.email || '',
+    senha: '',
+    tipo: usuario?.tipo || 'operador',
+  })
+  const [erros, setErros] = useState({})
+  const [mostrarSenha, setMostrarSenha] = useState(false)
+
+  useEffect(() => {
+    if (usuario && modo === 'editar') {
+      setForm({
+        nome: usuario.nome || '',
+        email: usuario.email || '',
+        senha: '',
+        tipo: usuario.tipo || 'operador',
+      })
+    } else {
+      setForm({ nome: '', email: '', senha: '', tipo: 'operador' })
+    }
+    setErros({})
+  }, [usuario, modo, isOpen])
+
+  const validar = () => {
+    const novosErros = {}
+    if (!form.nome.trim()) novosErros.nome = 'Nome é obrigatório'
+    if (!form.email.trim()) novosErros.email = 'Email é obrigatório'
+    if (modo === 'criar' && !form.senha) novosErros.senha = 'Senha é obrigatória'
+    if (!/^\S+@\S+\.\S+$/.test(form.email)) novosErros.email = 'Email inválido'
+    setErros(novosErros)
+    return Object.keys(novosErros).length === 0
+  }
+
+  const handleSave = () => {
+    if (!validar()) return
+    onSave(form, modo)
+  }
+
+  if (!isOpen) return null
+
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal-content" onClick={e => e.stopPropagation()}>
+        <div className="modal-header">
+          <h3>{modo === 'criar' ? 'Criar Novo Usuário' : 'Editar Usuário'}</h3>
+          <button className="modal-close-btn" onClick={onClose}>
+            <IcClose />
+          </button>
+        </div>
+
+        <div className="modal-body">
+          <div className="form-group">
+            <label>Nome</label>
+            <input
+              type="text"
+              value={form.nome}
+              onChange={e => setForm({ ...form, nome: e.target.value })}
+              placeholder="Nome do usuário"
+              disabled={carregando}
+            />
+            {erros.nome && <span className="error-text">{erros.nome}</span>}
+          </div>
+
+          <div className="form-group">
+            <label>Email</label>
+            <input
+              type="email"
+              value={form.email}
+              onChange={e => setForm({ ...form, email: e.target.value })}
+              placeholder="usuario@email.com"
+              disabled={carregando}
+            />
+            {erros.email && <span className="error-text">{erros.email}</span>}
+          </div>
+
+          <div className="form-group">
+            <label>Senha {modo === 'editar' && <span style={{ fontSize: '0.8em', color: '#888' }}>(deixar em branco para não alterar)</span>}</label>
+            <div className="input-password-wrapper">
+              <input
+                type={mostrarSenha ? 'text' : 'password'}
+                value={form.senha}
+                onChange={e => setForm({ ...form, senha: e.target.value })}
+                placeholder={modo === 'criar' ? 'Digite uma senha' : 'Nova senha (opcional)'}
+                disabled={carregando}
+              />
+              <button
+                type="button"
+                className="toggle-password-btn"
+                onClick={() => setMostrarSenha(!mostrarSenha)}
+                title={mostrarSenha ? 'Ocultar' : 'Mostrar'}
+              >
+                {mostrarSenha ? <IcEyeOff /> : <IcEye />}
+              </button>
+            </div>
+            {erros.senha && <span className="error-text">{erros.senha}</span>}
+          </div>
+
+          <div className="form-group">
+            <label>Tipo de Usuário</label>
+            <select value={form.tipo} onChange={e => setForm({ ...form, tipo: e.target.value })} disabled={carregando}>
+              <option value="admin">Admin</option>
+              <option value="operador">Operador</option>
+              <option value="lojista">Lojista</option>
+            </select>
+          </div>
+        </div>
+
+        <div className="modal-footer">
+          <button className="btn-cancel" onClick={onClose} disabled={carregando}>
+            Cancelar
+          </button>
+          <button className="btn-save" onClick={handleSave} disabled={carregando}>
+            {carregando ? 'Salvando...' : modo === 'criar' ? 'Criar' : 'Atualizar'}
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function Usuarios({ usuarios, onUsuariosAlterados, tipo }) {
+  const [listaUsuarios, setListaUsuarios] = useState(usuarios)
+  const [modalAberto, setModalAberto] = useState(false)
+  const [modoModal, setModoModal] = useState('criar')
+  const [usuarioSelecionado, setUsuarioSelecionado] = useState(null)
+  const [carregandoModal, setCarregandoModal] = useState(false)
+  const [carregandoAcao, setCarregandoAcao] = useState(null)
+  const [mensagem, setMensagem] = useState('')
+
+  useEffect(() => {
+    setListaUsuarios(usuarios)
+  }, [usuarios])
+
+  const abrirCriar = () => {
+    setModoModal('criar')
+    setUsuarioSelecionado(null)
+    setModalAberto(true)
+  }
+
+  const abrirEditar = (usuario) => {
+    setModoModal('editar')
+    setUsuarioSelecionado(usuario)
+    setModalAberto(true)
+  }
+
+  const fecharModal = () => {
+    setModalAberto(false)
+    setMensagem('')
+  }
+
+  const handleSalvarUsuario = async (form, modo) => {
+    setCarregandoModal(true)
+    try {
+      if (modo === 'criar') {
+        const res = await api.post('/cadastro', form)
+        setListaUsuarios([...listaUsuarios, res.usuario || { ...form, id: Date.now() }])
+        setMensagem('✓ Usuário criado com sucesso!')
+        setTimeout(() => fecharModal(), 1500)
+      } else {
+        const res = await api.put(`/usuarios/${usuarioSelecionado.id}`, form)
+        const usuarioAtualizado = res.usuario || { ...usuarioSelecionado, ...form }
+        setListaUsuarios(listaUsuarios.map(u => u.id === usuarioSelecionado.id ? usuarioAtualizado : u))
+        setMensagem('✓ Usuário atualizado com sucesso!')
+        setTimeout(() => fecharModal(), 1500)
+      }
+      onUsuariosAlterados()
+    } catch (err) {
+      setMensagem('✗ Erro: ' + (err.response?.data?.mensagem || err.message))
+    } finally {
+      setCarregandoModal(false)
+    }
+  }
+
+  const handleExcluir = async (usuario) => {
+    if (!window.confirm(`Tem certeza que deseja excluir o usuário ${usuario.nome}?`)) return
+    
+    setCarregandoAcao(usuario.id)
+    try {
+      await api.delete(`/usuarios/${usuario.id}`)
+      setListaUsuarios(listaUsuarios.filter(u => u.id !== usuario.id))
+      onUsuariosAlterados()
+    } catch (err) {
+      alert('Erro ao excluir: ' + (err.response?.data?.mensagem || err.message))
+    } finally {
+      setCarregandoAcao(null)
+    }
+  }
+
+  // Apenas admin pode gerenciar usuários
+  if (tipo !== 'admin') {
+    return (
+      <div className="dash-section">
+        <h2 className="dash-section-title">Usuários</h2>
+        <div style={{ padding: 24, color: '#c62828' }}>
+          Apenas administradores podem gerenciar usuários.
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="dash-section">
-      <h2 className="dash-section-title">Usuários</h2>
+      <div className="dash-section-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+        <h2 className="dash-section-title">Usuários</h2>
+        <button className="btn-novo" onClick={abrirCriar}>
+          <IcPlus /> Novo Usuário
+        </button>
+      </div>
+
+      {mensagem && (
+        <div style={{
+          marginBottom: 16,
+          padding: 12,
+          borderRadius: 4,
+          backgroundColor: mensagem.includes('✓') ? '#e8f5e9' : '#ffebee',
+          color: mensagem.includes('✓') ? '#2e7d32' : '#c62828',
+        }}>
+          {mensagem}
+        </div>
+      )}
+
       <div className="dash-table-box">
         <table className="dash-table">
           <thead>
@@ -232,29 +508,59 @@ function Usuarios({ usuarios }) {
               <th>#</th>
               <th>Nome</th>
               <th>E-mail</th>
+              <th>Senha</th>
               <th>Tipo</th>
+              <th>Ações</th>
             </tr>
           </thead>
           <tbody>
-            {usuarios.map(u => {
+            {listaUsuarios.map(u => {
               const tv = tipoConfig[u.tipo] || { label: u.tipo, classe: '' }
               return (
                 <tr key={u.id}>
                   <td className="td-id">#{u.id}</td>
                   <td>{u.nome}</td>
                   <td className="td-email">{u.email}</td>
+                  <td style={{ fontFamily: 'monospace', color: '#666' }}>{u.senha}</td>
                   <td>
                     <span className={`badge ${tv.classe}`}>{tv.label}</span>
+                  </td>
+                  <td className="td-acoes">
+                    <button
+                      className="btn-action btn-edit"
+                      onClick={() => abrirEditar(u)}
+                      title="Editar"
+                      disabled={carregandoAcao === u.id}
+                    >
+                      <IcEdit />
+                    </button>
+                    <button
+                      className="btn-action btn-delete"
+                      onClick={() => handleExcluir(u)}
+                      title="Excluir"
+                      disabled={carregandoAcao === u.id}
+                    >
+                      <IcDelete />
+                    </button>
                   </td>
                 </tr>
               )
             })}
-            {usuarios.length === 0 && (
-              <tr><td colSpan="4" style={{ textAlign: 'center', padding: 24, color: '#888' }}>Nenhum usuário.</td></tr>
+            {listaUsuarios.length === 0 && (
+              <tr><td colSpan="6" style={{ textAlign: 'center', padding: 24, color: '#888' }}>Nenhum usuário.</td></tr>
             )}
           </tbody>
         </table>
       </div>
+
+      <ModalUsuario
+        isOpen={modalAberto}
+        modo={modoModal}
+        usuario={usuarioSelecionado}
+        onClose={fecharModal}
+        onSave={handleSalvarUsuario}
+        carregando={carregandoModal}
+      />
     </div>
   )
 }
@@ -309,13 +615,7 @@ function Dashboard() {
   const [carregando, setCarregando] = useState(true)
   const [erroCarregamento, setErroCarregamento] = useState('')
 
-  useEffect(() => {
-    if (!sessionStorage.getItem('usuario')) {
-      navigate('/')
-    }
-  }, [navigate])
-
-  useEffect(() => {
+  const carregarDados = () => {
     let cancelado = false
     setCarregando(true)
     setErroCarregamento('')
@@ -336,6 +636,16 @@ function Dashboard() {
       })
 
     return () => { cancelado = true }
+  }
+
+  useEffect(() => {
+    if (!sessionStorage.getItem('usuario')) {
+      navigate('/')
+    }
+  }, [navigate])
+
+  useEffect(() => {
+    carregarDados()
   }, [])
 
   const resumo = useMemo(() => ({
@@ -365,7 +675,7 @@ function Dashboard() {
     }
     if (secao === 'visao-geral') return <VisaoGeral resumo={resumo} entregas={entregas} />
     if (secao === 'pedidos') return <Pedidos entregas={entregas} />
-    if (secao === 'usuarios') return <Usuarios usuarios={usuarios} />
+    if (secao === 'usuarios') return <Usuarios usuarios={usuarios} tipo={tipo} onUsuariosAlterados={carregarDados} />
     if (secao === 'lojas') return <Lojas lojas={lojas} />
   }
 
