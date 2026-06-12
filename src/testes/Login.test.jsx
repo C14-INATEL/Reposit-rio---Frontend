@@ -27,7 +27,7 @@ describe('Tela de Login', () => {
   it('renderiza os campos de usuário, senha e botão de entrar', () => {
     renderLogin()
 
-    expect(screen.getByPlaceholderText(/Digite seu usuário/i)).toBeInTheDocument()
+    expect(screen.getByPlaceholderText(/Digite seu e-mail/i)).toBeInTheDocument()
     expect(screen.getByPlaceholderText('Digite sua senha')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /entrar/i })).toBeInTheDocument()
   })
@@ -40,7 +40,7 @@ describe('Tela de Login', () => {
 
     renderLogin()
 
-    fireEvent.change(screen.getByPlaceholderText(/Digite seu usuário/i), {
+    fireEvent.change(screen.getByPlaceholderText(/Digite seu e-mail/i), {
       target: { value: 'admin@email.com' },
     })
     fireEvent.change(screen.getByPlaceholderText('Digite sua senha'), {
@@ -66,7 +66,7 @@ describe('Tela de Login', () => {
 
     renderLogin()
 
-    fireEvent.change(screen.getByPlaceholderText(/Digite seu usuário/i), {
+    fireEvent.change(screen.getByPlaceholderText(/Digite seu e-mail/i), {
       target: { value: 'ana.santos@email.com' },
     })
     fireEvent.change(screen.getByPlaceholderText('Digite sua senha'), {
@@ -92,8 +92,8 @@ describe('Tela de Login', () => {
 
     renderLogin()
 
-    fireEvent.change(screen.getByPlaceholderText(/Digite seu usuário/i), {
-      target: { value: 'errado' },
+    fireEvent.change(screen.getByPlaceholderText(/Digite seu e-mail/i), {
+      target: { value: 'errado@email.com' },
     })
     fireEvent.change(screen.getByPlaceholderText('Digite sua senha'), {
       target: { value: 'errado' },

@@ -48,8 +48,8 @@ describe('Dashboard — mock de chamadas à API', () => {
       </MemoryRouter>
     )
 
-    fireEvent.change(screen.getByPlaceholderText('Digite seu usuário'), {
-      target: { value: 'fernanda' },
+    fireEvent.change(screen.getByPlaceholderText('Digite seu e-mail'), {
+      target: { value: 'fernanda.lima@duck.com' },
     })
     fireEvent.change(screen.getByPlaceholderText('Digite sua senha'), {
       target: { value: 'senha123' },
@@ -65,7 +65,10 @@ describe('Dashboard — mock de chamadas à API', () => {
 
     expect(global.fetch).toHaveBeenCalledWith(
       'http://localhost:3000/login',
-      expect.objectContaining({ method: 'POST' })
+      expect.objectContaining({
+        method: 'POST',
+        body: JSON.stringify({ email: 'fernanda.lima@duck.com', senha: 'senha123' }),
+      })
     )
   })
 
