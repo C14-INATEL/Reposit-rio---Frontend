@@ -1,37 +1,29 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { api } from '../api/api'
 import '../styles/Rastreio.css'
 
-const pedidosMock = [
-  {
-    id: 1,
-    rastreio: 'TRK-ABC123XYZ-1A2B',
-    lojista: 'Loja Sul Ltda',
-    regiao: 'Sul',
-    peso: 10.5,
-    tipo: 'Urgente',
-    status: 2,
-    data: '05/04/2026',
-    custo: 52.50
-  },
-  {
-    id: 2,
-    rastreio: 'TRK-DEF456UVW-3C4D',
-    lojista: 'Tech Norte Comércio',
-    regiao: 'Norte',
-    peso: 5.2,
-    tipo: 'Normal',
-    status: 1,
-    data: '04/04/2026',
-    custo: 39.00
-  }
-]
-
 const statusConfig = {
-  1: { label: 'Pendente',  classe: 'status-pendente',  cor: '#c47f00' },
-  2: { label: 'Em Rota',   classe: 'status-emrota',    cor: '#f0a500' },
-  3: { label: 'Entregue',  classe: 'status-entregue',  cor: '#2e7d32' },
-  4: { label: 'Cancelado', classe: 'status-cancelado', cor: '#c62828' }
+  criado:    { label: 'Pendente',  classe: 'status-pendente',  cor: '#c47f00' },
+  andamento: { label: 'Em rota',   classe: 'status-emrota',    cor: '#f0a500' },
+  enviado:   { label: 'Em rota',   classe: 'status-emrota',    cor: '#f0a500' },
+  entregue:  { label: 'Entregue',  classe: 'status-entregue',  cor: '#2e7d32' },
+  cancelado: { label: 'Cancelado', classe: 'status-cancelado', cor: '#c62828' },
+}
+
+function statusVisual(status) {
+  return statusConfig[status] || { label: status, classe: '' }
+}
+
+function codigoRastreio(id) {
+  return `DUCK-${String(id).padStart(5, '0')}`
+}
+
+function formatarData(iso) {
+  if (!iso) return '-'
+  const d = new Date(iso)
+  if (isNaN(d.getTime())) return '-'
+  return d.toLocaleDateString('pt-BR')
 }
 
 function IcBusca() {
@@ -51,31 +43,48 @@ function IcVoltar() {
   )
 }
 
+// Aceita códigos no formato DUCK-00001 ou simplesmente o número da entrega
+function extrairIdRastreio(input) {
+  const limpo = input.trim().toUpperCase()
+  if (!limpo) return null
+  const semPrefixo = limpo.replace(/^DUCK-/, '').replace(/^0+/, '')
+  const id = Number(semPrefixo)
+  return Number.isInteger(id) && id > 0 ? id : null
+}
+
 function Rastreio() {
   const navigate = useNavigate()
   const [rastreioInput, setRastreioInput] = useState('')
   const [pedido, setPedido] = useState(null)
   const [erro, setErro] = useState('')
   const [copiado, setCopiado] = useState(false)
+  const [carregando, setCarregando] = useState(false)
 
-  const buscarPedido = () => {
+  const buscarPedido = async () => {
     setErro('')
     setPedido(null)
-    const codigo = rastreioInput.toUpperCase().trim()
-    if (!codigo) {
-      setErro('Digite o código de rastreio.')
+    const id = extrairIdRastreio(rastreioInput)
+    if (id === null) {
+      setErro('Digite um código de rastreio válido (ex: DUCK-00001 ou 1).')
       return
     }
-    const encontrado = pedidosMock.find(p => p.rastreio === codigo)
-    if (encontrado) {
-      setPedido(encontrado)
-    } else {
-      setErro('Código de rastreio não encontrado.')
+    setCarregando(true)
+    try {
+      const data = await api.get(`/entregas/${id}`)
+      setPedido(data)
+    } catch (err) {
+      if (err.status === 404) {
+        setErro('Código de rastreio não encontrado.')
+      } else {
+        setErro(err.message || 'Erro ao buscar pedido.')
+      }
+    } finally {
+      setCarregando(false)
     }
   }
 
   const copiar = () => {
-    navigator.clipboard.writeText(pedido.rastreio)
+    navigator.clipboard.writeText(codigoRastreio(pedido.id))
     setCopiado(true)
     setTimeout(() => setCopiado(false), 2000)
   }
@@ -117,14 +126,14 @@ function Rastreio() {
             <input
               type="text"
               className="rastreio-input"
-              placeholder="Ex: TRK-ABC123XYZ-1A2B"
+              placeholder="Ex: DUCK-00001"
               value={rastreioInput}
               onChange={(e) => setRastreioInput(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && buscarPedido()}
             />
-            <button className="rastreio-btn-buscar" onClick={buscarPedido}>
+            <button className="rastreio-btn-buscar" onClick={buscarPedido} disabled={carregando}>
               <IcBusca />
-              Buscar
+              {carregando ? 'Buscando...' : 'Buscar'}
             </button>
           </div>
 
@@ -137,13 +146,13 @@ function Rastreio() {
 
             {/* STATUS */}
             <div className="rastreio-status-card">
-              <div className={`rastreio-status-badge ${statusConfig[pedido.status].classe}`}>
-                {statusConfig[pedido.status].label}
+              <div className={`rastreio-status-badge ${statusVisual(pedido.status).classe}`}>
+                {statusVisual(pedido.status).label}
               </div>
               <div className="rastreio-status-info">
                 <span className="rastreio-codigo-label">Código de rastreio</span>
                 <div className="rastreio-codigo-row">
-                  <strong className="rastreio-codigo">{pedido.rastreio}</strong>
+                  <strong className="rastreio-codigo">{codigoRastreio(pedido.id)}</strong>
                   <button className="btn-copiar" onClick={copiar} title="Copiar código">
                     {copiado ? '✓' : '⎘'}
                   </button>
@@ -160,27 +169,29 @@ function Rastreio() {
                 <thead>
                   <tr>
                     <th>#</th>
-                    <th>Lojista</th>
+                    <th>Loja</th>
                     <th>Região</th>
-                    <th>Peso</th>
-                    <th>Tipo</th>
+                    <th>Descrição</th>
+                    <th>Prioridade</th>
                     <th>Custo</th>
-                    <th>Data</th>
+                    <th>Data Pedido</th>
+                    <th>Data Entrega</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr>
                     <td className="td-id">#{pedido.id}</td>
-                    <td>{pedido.lojista}</td>
-                    <td>{pedido.regiao}</td>
-                    <td>{pedido.peso}kg</td>
+                    <td>{pedido.loja_nome}</td>
+                    <td>{pedido.regiao_nome}</td>
+                    <td>{pedido.descricao}</td>
                     <td>
-                      <span className={`badge tipo-${pedido.tipo.toLowerCase()}`}>
-                        {pedido.tipo}
+                      <span className={`badge tipo-${pedido.prioridade === 'urgente' ? 'urgente' : 'normal'}`}>
+                        {pedido.prioridade}
                       </span>
                     </td>
-                    <td>R$ {pedido.custo.toFixed(2)}</td>
-                    <td className="td-data">{pedido.data}</td>
+                    <td>R$ {Number(pedido.custo || 0).toFixed(2)}</td>
+                    <td className="td-data">{formatarData(pedido.data_pedido)}</td>
+                    <td className="td-data">{formatarData(pedido.data_entrega)}</td>
                   </tr>
                 </tbody>
               </table>

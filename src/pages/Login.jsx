@@ -11,40 +11,10 @@ function Login() {
   const [erro, setErro] = useState('')
   const [carregando, setCarregando] = useState(false)
 
-  // Usuários mock para navegação sem backend
-  const MOCK_USERS = [
-    { usuario: 'admin', senha: '1234', tipo: 'admin' },
-    { usuario: 'operador', senha: '1234', tipo: 'operador' },
-    { usuario: 'lojista', senha: '1234', tipo: 'lojista' },
-  ]
-
   const handleSubmit = async (e) => {
     e.preventDefault()
     setErro('')
     setCarregando(true)
-
-    // Verifica mock antes de chamar o backend
-    const mockUser = MOCK_USERS.find(u => u.usuario === usuario && u.senha === senha)
-    if (mockUser) {
-      sessionStorage.setItem('usuario', usuario)
-      sessionStorage.setItem('tipo', mockUser.tipo)
-      if (rememberMe) localStorage.setItem('usuarioSalvo', usuario)
-      
-        if (mockUser.tipo === 'admin') {
-           navigate('/dashboard', { state: { usuario, tipo: mockUser.tipo } })
-        }
-
-        if (mockUser.tipo === 'operador') {
-          navigate('/dashboard', { state: { usuario, tipo: mockUser.tipo } })
-         }
-
-         if (mockUser.tipo === 'lojista') {
-          navigate('/lojista', { state: { usuario, tipo: mockUser.tipo } })
-         }
-         
-      setCarregando(false)
-      return
-    }
 
     try {
       const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000'
@@ -66,29 +36,35 @@ function Login() {
 
       if (response.ok) {
         const data = await response.json()
-        
-        // Armazenar dados do usuário na sessão
-        sessionStorage.setItem('usuario', usuario)
+
+        // Nome legível para o header — preferimos o nome retornado pelo backend
+        const nomeExibicao = data.usuario?.nome || usuario
+
+        sessionStorage.setItem('usuario', nomeExibicao)
         sessionStorage.setItem('tipo', data.tipo)
-        
-        // Se "Lembrar-me" estiver ativo salva as informações no localStorage
+        if (data.usuario?.id) {
+          sessionStorage.setItem('userId', String(data.usuario.id))
+        }
+        if (data.usuario?.email) {
+          sessionStorage.setItem('email', data.usuario.email)
+        }
+
         if (rememberMe) {
           localStorage.setItem('usuarioSalvo', usuario)
         }
-        
+
         if (data.tipo === 'lojista') {
-          navigate('/lojista', { state: { usuario, tipo: data.tipo } })
+          navigate('/lojista', { state: { usuario: nomeExibicao, tipo: data.tipo, userId: data.usuario?.id } })
         } else {
-          navigate('/dashboard', { state: { usuario, tipo: data.tipo } })
+          navigate('/dashboard', { state: { usuario: nomeExibicao, tipo: data.tipo, userId: data.usuario?.id } })
         }
       } else {
         const data = await response.json()
         setErro(data.mensagem || 'Usuário ou senha incorretos.')
       }
     } catch (err) {
-      console.error('Erro completo:', err)
-      console.error('Tipo de erro:', err.name)
-      console.error('Mensagem:', err.message)
+      console.error('Erro ao conectar com o backend:', err)
+      setErro('Não foi possível conectar ao servidor. Verifique se o backend está rodando.')
     } finally {
       setCarregando(false)
     }

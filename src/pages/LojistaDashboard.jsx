@@ -1,34 +1,22 @@
 // LojistaDashboard.jsx
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
+import { api } from '../api/api'
 import '../styles/LojistaDashboard.css'
 
-// Dados mockados para lojista
-const resumoInicial = {
-  totalPedidos: 24,
-  pendentes: 8,
-  emRota: 5,
-  entregues: 11,
-}
-
-const pedidosMock = [
-  { id: 1, regiao: 'Sul', peso: 10, tipo: 'Normal', status: 2, data: '05/04/2026', custo: 50 },
-  { id: 2, regiao: 'Sudeste', peso: 5, tipo: 'Urgente', status: 1, data: '04/04/2026', custo: 80 },
-  { id: 3, regiao: 'Sul', peso: 15, tipo: 'Normal', status: 3, data: '04/04/2026', custo: 75 },
-  { id: 4, regiao: 'Norte', peso: 8, tipo: 'Normal', status: 1, data: '03/04/2026', custo: 40 },
-  { id: 5, regiao: 'Centro-Oeste', peso: 12, tipo: 'Urgente', status: 3, data: '02/04/2026', custo: 108 },
-]
-
 const statusConfig = {
-  1: { label: 'Pendente', classe: 'status-pendente' },
-  2: { label: 'Em rota', classe: 'status-emrota' },
-  3: { label: 'Entregue', classe: 'status-entregue' },
-  4: { label: 'Cancelado', classe: 'status-cancelado' },
+  criado:    { label: 'Pendente',  classe: 'status-pendente' },
+  andamento: { label: 'Em rota',   classe: 'status-emrota' },
+  enviado:   { label: 'Em rota',   classe: 'status-emrota' },
+  entregue:  { label: 'Entregue',  classe: 'status-entregue' },
+  cancelado: { label: 'Cancelado', classe: 'status-cancelado' },
 }
 
-const tipoConfig = {
-  Normal: { label: 'Normal', classe: 'tipo-normal' },
-  Urgente: { label: 'Urgente', classe: 'tipo-urgente' },
+const prioridadeConfig = {
+  baixa:   { label: 'Baixa',   classe: 'tipo-normal' },
+  media:   { label: 'Normal',  classe: 'tipo-normal' },
+  alta:    { label: 'Alta',    classe: 'tipo-urgente' },
+  urgente: { label: 'Urgente', classe: 'tipo-urgente' },
 }
 
 const navItems = [
@@ -90,19 +78,33 @@ function getIcone(id) {
   return null
 }
 
-function gerarIdRastreio() {
-  // UUID v4 simples - padrão da indústria (melhor prática)
-  return 'TRK-' + Math.random().toString(36).substr(2, 9).toUpperCase() + 
-         '-' + Date.now().toString(36).toUpperCase().substr(-4);
+function codigoRastreio(id) {
+  return `DUCK-${String(id).padStart(5, '0')}`
 }
 
-function calcularCusto(peso, tipo) {
-  let base = peso * 5
-  if (tipo === 'Urgente') base *= 1.5
-  return Math.round(base)
+function calcularCusto(regiao, prioridade) {
+  if (!regiao) return 0
+  const base = Number(regiao.custo_base) || 0
+  const fator = prioridade === 'urgente' ? 1.5 : prioridade === 'alta' ? 1.25 : 1
+  return Number((base * fator).toFixed(2))
 }
 
-function VisaoGeral({ resumo, pedidos, onNovoPedido }) {
+function statusVisual(status) {
+  return statusConfig[status] || { label: status, classe: '' }
+}
+
+function prioridadeVisual(prio) {
+  return prioridadeConfig[prio] || { label: prio, classe: '' }
+}
+
+function formatarData(iso) {
+  if (!iso) return '-'
+  const d = new Date(iso)
+  if (isNaN(d.getTime())) return '-'
+  return d.toLocaleDateString('pt-BR')
+}
+
+function VisaoGeral({ resumo, entregas, onNovoPedido }) {
   return (
     <div className="dash-section">
       <h2 className="dash-section-title">Visão Geral</h2>
@@ -111,30 +113,22 @@ function VisaoGeral({ resumo, pedidos, onNovoPedido }) {
         <div className="dash-card">
           <span className="dash-card-label">Total de Pedidos</span>
           <span className="dash-card-value">{resumo.totalPedidos}</span>
-          <span className="dash-card-icon card-icon-total">
-            <IcPedidos />
-          </span>
+          <span className="dash-card-icon card-icon-total"><IcPedidos /></span>
         </div>
         <div className="dash-card">
           <span className="dash-card-label">Pendentes</span>
           <span className="dash-card-value card-value-pendente">{resumo.pendentes}</span>
-          <span className="dash-card-icon card-icon-pendente">
-            <IcPedidos />
-          </span>
+          <span className="dash-card-icon card-icon-pendente"><IcPedidos /></span>
         </div>
         <div className="dash-card">
           <span className="dash-card-label">Em Rota</span>
           <span className="dash-card-value card-value-emrota">{resumo.emRota}</span>
-          <span className="dash-card-icon card-icon-emrota">
-            <IcPedidos />
-          </span>
+          <span className="dash-card-icon card-icon-emrota"><IcPedidos /></span>
         </div>
         <div className="dash-card">
           <span className="dash-card-label">Entregues</span>
           <span className="dash-card-value card-value-entregue">{resumo.entregues}</span>
-          <span className="dash-card-icon card-icon-entregue">
-            <IcPedidos />
-          </span>
+          <span className="dash-card-icon card-icon-entregue"><IcPedidos /></span>
         </div>
       </div>
 
@@ -150,33 +144,33 @@ function VisaoGeral({ resumo, pedidos, onNovoPedido }) {
           <thead>
             <tr>
               <th>#</th>
+              <th>Descrição</th>
               <th>Região</th>
-              <th>Peso</th>
-              <th>Tipo</th>
+              <th>Prioridade</th>
               <th>Status</th>
               <th>Custo</th>
               <th>Rastreio</th>
             </tr>
           </thead>
           <tbody>
-            {pedidos.slice(0, 5).map(p => (
-              <tr key={p.id}>
-                <td className="td-id">#{p.id}</td>
-                <td>{p.regiao}</td>
-                <td>{p.peso}kg</td>
-                <td>
-                  <span className={`badge ${tipoConfig[p.tipo].classe}`}>
-                    {tipoConfig[p.tipo].label}
-                  </span>
-                </td>
-                <td>
-                  <span className={`badge ${statusConfig[p.status].classe}`}>
-                    {statusConfig[p.status].label}
-                  </span>
-                </td>
-                <td className="td-data">R$ {p.custo}</td>
-              </tr>
-            ))}
+            {entregas.slice(0, 5).map(p => {
+              const sv = statusVisual(p.status)
+              const pv = prioridadeVisual(p.prioridade)
+              return (
+                <tr key={p.id}>
+                  <td className="td-id">#{p.id}</td>
+                  <td>{p.descricao}</td>
+                  <td>{p.regiao_nome}</td>
+                  <td><span className={`badge ${pv.classe}`}>{pv.label}</span></td>
+                  <td><span className={`badge ${sv.classe}`}>{sv.label}</span></td>
+                  <td className="td-data">R$ {Number(p.custo || 0).toFixed(2)}</td>
+                  <td><code>{codigoRastreio(p.id)}</code></td>
+                </tr>
+              )
+            })}
+            {entregas.length === 0 && (
+              <tr><td colSpan="7" style={{ textAlign: 'center', padding: 24, color: '#888' }}>Nenhum pedido. Clique em "Novo Pedido" para começar.</td></tr>
+            )}
           </tbody>
         </table>
       </div>
@@ -184,7 +178,7 @@ function VisaoGeral({ resumo, pedidos, onNovoPedido }) {
   )
 }
 
-function Pedidos({ pedidos, onNovoPedido, onEditarPedido, onCancelarPedido }) {
+function Pedidos({ entregas, onNovoPedido, onEditarPedido, onCancelarPedido }) {
   return (
     <div className="dash-section">
       <div className="dash-section-header">
@@ -200,62 +194,61 @@ function Pedidos({ pedidos, onNovoPedido, onEditarPedido, onCancelarPedido }) {
           <thead>
             <tr>
               <th>#</th>
+              <th>Descrição</th>
               <th>Região</th>
-              <th>Peso</th>
-              <th>Tipo</th>
+              <th>Prioridade</th>
               <th>Status</th>
               <th>Custo</th>
+              <th>Rastreio</th>
+              <th>Data</th>
               <th>Ações</th>
             </tr>
           </thead>
           <tbody>
-            {pedidos.map(p => (
-              <tr key={p.id}>
-                <td className="td-id">#{p.id}</td>
-                <td>{p.regiao}</td>
-                <td>{p.peso}kg</td>
-                <td>
-                  <span className={`badge ${tipoConfig[p.tipo].classe}`}>
-                    {tipoConfig[p.tipo].label}
-                  </span>
-                </td>
-                <td>
-                  <span className={`badge ${statusConfig[p.status].classe}`}>
-                    {statusConfig[p.status].label}
-                  </span>
-                </td>
-                <td className="td-data">R$ {p.custo}</td>
-                <td>
-
-                  <td className="td-rastreio">
+            {entregas.map(p => {
+              const sv = statusVisual(p.status)
+              const pv = prioridadeVisual(p.prioridade)
+              return (
+                <tr key={p.id}>
+                  <td className="td-id">#{p.id}</td>
+                  <td>{p.descricao}</td>
+                  <td>{p.regiao_nome}</td>
+                  <td><span className={`badge ${pv.classe}`}>{pv.label}</span></td>
+                  <td><span className={`badge ${sv.classe}`}>{sv.label}</span></td>
+                  <td className="td-data">R$ {Number(p.custo || 0).toFixed(2)}</td>
+                  <td>
                     <div className="td-rastreio">
-                     <strong>{p.rastreio}</strong>
-                    <button 
-
-                     className="btn-copiar" 
-                     onClick={() => navigator.clipboard.writeText(p.rastreio)}
-                     title="Copiar rastreio"
-                   >
-    
-                   </button>
-                   </div>
-                   </td>
-                  
-                  <div className="acoes">
-                    {p.status === 1 && (
-                      <>
-                        <button className="btn-editar" onClick={() => onEditarPedido(p)}>
-                          Editar
-                        </button>
-                        <button className="btn-cancelar" onClick={() => onCancelarPedido(p.id)}>
-                          Cancelar
-                        </button>
-                      </>
-                    )}
-                  </div>
-                </td>
-              </tr>
-            ))}
+                      <strong>{codigoRastreio(p.id)}</strong>
+                      <button
+                        className="btn-copiar"
+                        onClick={() => navigator.clipboard.writeText(codigoRastreio(p.id))}
+                        title="Copiar rastreio"
+                      >
+                        ⎘
+                      </button>
+                    </div>
+                  </td>
+                  <td className="td-data">{formatarData(p.data_pedido)}</td>
+                  <td>
+                    <div className="acoes">
+                      {p.status === 'criado' && (
+                        <>
+                          <button className="btn-editar" onClick={() => onEditarPedido(p)}>
+                            Editar
+                          </button>
+                          <button className="btn-cancelar" onClick={() => onCancelarPedido(p.id)}>
+                            Cancelar
+                          </button>
+                        </>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              )
+            })}
+            {entregas.length === 0 && (
+              <tr><td colSpan="9" style={{ textAlign: 'center', padding: 24, color: '#888' }}>Nenhum pedido cadastrado.</td></tr>
+            )}
           </tbody>
         </table>
       </div>
@@ -263,64 +256,83 @@ function Pedidos({ pedidos, onNovoPedido, onEditarPedido, onCancelarPedido }) {
   )
 }
 
-function FormNovoPedido({ onClose, onCreate, novoPedido, setNovoPedido }) {
-  const custo = calcularCusto(parseFloat(novoPedido.peso) || 0, novoPedido.tipo)
+function FormPedido({ onClose, onSubmit, form, setForm, regioes, lojas, editando, salvando }) {
+  const regiaoSelecionada = regioes.find(r => r.id === Number(form.regiao_id))
+  const custo = calcularCusto(regiaoSelecionada, form.prioridade)
+  const precisaEscolherLoja = lojas.length > 1
 
   return (
     <div className="form-overlay">
       <div className="form-sidebar">
         <div className="form-header">
-          <h3>Novo Pedido</h3>
-          <button className="form-close" onClick={onClose}>
-            ×
-          </button>
+          <h3>{editando ? 'Editar Pedido' : 'Novo Pedido'}</h3>
+          <button className="form-close" onClick={onClose}>×</button>
         </div>
 
         <div className="form-body">
-          <label>Região *</label>
-          <select 
-            value={novoPedido.regiao} 
-            onChange={e => setNovoPedido({ ...novoPedido, regiao: e.target.value })}
-            required
-          >
-            <option value="">Selecione</option>
-            <option value="Sul">Sul</option>
-            <option value="Sudeste">Sudeste</option>
-            <option value="Norte">Norte</option>
-            <option value="Nordeste">Nordeste</option>
-            <option value="Centro-Oeste">Centro-Oeste</option>
-          </select>
+          {precisaEscolherLoja && (
+            <>
+              <label>Loja *</label>
+              <select
+                value={form.loja_id}
+                onChange={e => setForm({ ...form, loja_id: e.target.value })}
+                required
+              >
+                <option value="">Selecione</option>
+                {lojas.map(l => (
+                  <option key={l.id} value={l.id}>{l.nome}</option>
+                ))}
+              </select>
+            </>
+          )}
 
-          <label>Peso (kg) *</label>
+          <label>Descrição *</label>
           <input
-            type="number"
-            min="1"
-            step="0.1"
-            value={novoPedido.peso}
-            onChange={e => setNovoPedido({ ...novoPedido, peso: e.target.value })}
+            type="text"
+            placeholder="Ex: 5kg de produtos refrigerados"
+            value={form.descricao}
+            onChange={e => setForm({ ...form, descricao: e.target.value })}
             required
           />
 
-          <label>Tipo</label>
-          <select 
-            value={novoPedido.tipo} 
-            onChange={e => setNovoPedido({ ...novoPedido, tipo: e.target.value })}
+          <label>Região *</label>
+          <select
+            value={form.regiao_id}
+            onChange={e => setForm({ ...form, regiao_id: e.target.value })}
+            required
           >
-            <option value="Normal">Normal</option>
-            <option value="Urgente">Urgente</option>
+            <option value="">Selecione</option>
+            {regioes.map(r => (
+              <option key={r.id} value={r.id}>
+                {r.nome} (base R$ {Number(r.custo_base).toFixed(2)})
+              </option>
+            ))}
+          </select>
+
+          <label>Prioridade</label>
+          <select
+            value={form.prioridade}
+            onChange={e => setForm({ ...form, prioridade: e.target.value })}
+          >
+            <option value="baixa">Baixa</option>
+            <option value="media">Normal</option>
+            <option value="alta">Alta</option>
+            <option value="urgente">Urgente</option>
           </select>
 
           <div className="custo-preview">
-            Custo estimado: <strong>R$ {custo}</strong>
+            Custo estimado: <strong>R$ {custo.toFixed(2)}</strong>
           </div>
 
           <div className="form-actions">
-            <button className="btn-primary" onClick={onCreate} disabled={!novoPedido.regiao || !novoPedido.peso}>
-              Criar Pedido
+            <button
+              className="btn-primary"
+              onClick={onSubmit}
+              disabled={salvando || !form.descricao || !form.regiao_id || (precisaEscolherLoja && !form.loja_id)}
+            >
+              {salvando ? 'Salvando...' : (editando ? 'Salvar' : 'Criar Pedido')}
             </button>
-            <button className="btn-secondary" onClick={onClose}>
-              Cancelar
-            </button>
+            <button className="btn-secondary" onClick={onClose}>Cancelar</button>
           </div>
         </div>
       </div>
@@ -328,23 +340,35 @@ function FormNovoPedido({ onClose, onCreate, novoPedido, setNovoPedido }) {
   )
 }
 
+function FORM_INICIAL(lojaPadrao) {
+  return {
+    loja_id: lojaPadrao || '',
+    descricao: '',
+    regiao_id: '',
+    prioridade: 'media',
+  }
+}
+
 function LojistaDashboard() {
   const navigate = useNavigate()
   const location = useLocation()
 
   const usuario = location.state?.usuario || sessionStorage.getItem('usuario') || 'Lojista'
-  
+  const userId = location.state?.userId || sessionStorage.getItem('userId')
+
   const [secao, setSecao] = useState('visao-geral')
   const [recolhida, setRecolhida] = useState(false)
-  const [pedidos, setPedidos] = useState(pedidosMock)
-  const [resumo, setResumo] = useState(resumoInicial)
+
+  const [entregas, setEntregas] = useState([])
+  const [lojas, setLojas] = useState([])
+  const [regioes, setRegioes] = useState([])
+  const [carregando, setCarregando] = useState(true)
+  const [erroCarregamento, setErroCarregamento] = useState('')
+
   const [mostrarForm, setMostrarForm] = useState(false)
-  const [novoPedido, setNovoPedido] = useState({
-    regiao: '',
-    peso: '',
-    tipo: 'Normal'
-  })
-  const [editandoPedido, setEditandoPedido] = useState(null)
+  const [form, setForm] = useState(FORM_INICIAL())
+  const [editando, setEditando] = useState(null)
+  const [salvando, setSalvando] = useState(false)
 
   useEffect(() => {
     if (!sessionStorage.getItem('usuario')) {
@@ -352,92 +376,152 @@ function LojistaDashboard() {
     }
   }, [navigate])
 
+  const carregarTudo = () => {
+    if (!userId) {
+      setErroCarregamento('Não foi possível identificar o usuário logado. Faça login novamente.')
+      setCarregando(false)
+      return
+    }
+    setCarregando(true)
+    setErroCarregamento('')
+
+    Promise.all([
+      api.get(`/entregas?lojista_id=${userId}`),
+      api.get(`/lojas?usuario_id=${userId}`),
+      api.get('/regioes'),
+    ])
+      .then(([e, l, r]) => {
+        setEntregas(Array.isArray(e) ? e : [])
+        setLojas(Array.isArray(l) ? l : [])
+        setRegioes(Array.isArray(r) ? r : [])
+      })
+      .catch(err => {
+        console.error('Erro ao carregar dashboard do lojista:', err)
+        setErroCarregamento(err.message || 'Erro ao carregar dados.')
+      })
+      .finally(() => setCarregando(false))
+  }
+
   useEffect(() => {
-    // Recalcular resumo baseado nos pedidos
-    const pendentes = pedidos.filter(p => p.status === 1).length
-    const emRota = pedidos.filter(p => p.status === 2).length
-    const entregues = pedidos.filter(p => p.status === 3).length
-    
-    setResumo({
-      totalPedidos: pedidos.length,
-      pendentes,
-      emRota,
-      entregues
-    })
-  }, [pedidos])
+    carregarTudo()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userId])
+
+  const resumo = useMemo(() => ({
+    totalPedidos: entregas.length,
+    pendentes:    entregas.filter(e => e.status === 'criado').length,
+    emRota:       entregas.filter(e => e.status === 'andamento' || e.status === 'enviado').length,
+    entregues:    entregas.filter(e => e.status === 'entregue').length,
+  }), [entregas])
 
   const handleLogout = () => {
     sessionStorage.clear()
     navigate('/')
   }
 
-  const criarPedido = () => {
-     const rastreio = gerarIdRastreio(); // GERA ID RASTREIO AUTOMATICAMENTE
-     const novo = {
-    id: Math.max(...pedidos.map(p => p.id), 0) + 1,
-    rastreio: rastreio,
-    lojista: usuario,   // Nome do lojista atual
-    ...novoPedido,
-    status: 1,
-    data: new Date().toLocaleDateString('pt-BR'),
-    custo: calcularCusto(parseFloat(novoPedido.peso), novoPedido.tipo)
+  const abrirNovoPedido = () => {
+    setEditando(null)
+    const lojaPadrao = lojas.length === 1 ? lojas[0].id : ''
+    setForm(FORM_INICIAL(lojaPadrao))
+    setMostrarForm(true)
   }
 
-    setPedidos([novo, ...pedidos])
+  const fecharForm = () => {
     setMostrarForm(false)
-    setNovoPedido({ regiao: '', peso: '', tipo: 'Normal' })
-
-    alert(`Pedido criado!\nID: ${novo.id}\nRastreio: ${rastreio}\n\nCompartilhe o código de rastreio com seu cliente!`)
+    setEditando(null)
+    setForm(FORM_INICIAL())
   }
 
-  const editarPedido = (pedido) => {
-    setEditandoPedido(pedido)
-    setNovoPedido({
-      regiao: pedido.regiao,
-      peso: pedido.peso.toString(),
-      tipo: pedido.tipo
+  const editarPedido = (p) => {
+    setEditando(p)
+    setForm({
+      loja_id: p.loja_id,
+      descricao: p.descricao || '',
+      regiao_id: p.regiao_id,
+      prioridade: p.prioridade,
     })
     setMostrarForm(true)
   }
 
-  const salvarEdicao = () => {
-    setPedidos(pedidos.map(p =>
-      p.id === editandoPedido.id
-        ? {
-            ...p,
-            ...novoPedido,
-            custo: calcularCusto(parseFloat(novoPedido.peso), novoPedido.tipo)
-          }
-        : p
-    ))
-    setMostrarForm(false)
-    setNovoPedido({ regiao: '', peso: '', tipo: 'Normal' })
-    setEditandoPedido(null)
+  const salvar = async () => {
+    if (lojas.length === 0) {
+      alert('Você ainda não tem nenhuma loja cadastrada. Peça ao admin para cadastrar.')
+      return
+    }
+    const lojaIdFinal = form.loja_id || (lojas[0] && lojas[0].id)
+    const regiao = regioes.find(r => r.id === Number(form.regiao_id))
+    const custo = calcularCusto(regiao, form.prioridade)
+
+    const payload = {
+      descricao: form.descricao,
+      loja_id: Number(lojaIdFinal),
+      regiao_id: Number(form.regiao_id),
+      prioridade: form.prioridade,
+      custo,
+    }
+
+    setSalvando(true)
+    try {
+      if (editando) {
+        await api.put(`/entregas/${editando.id}`, payload)
+      } else {
+        await api.post('/entregas', payload)
+      }
+      fecharForm()
+      carregarTudo()
+    } catch (err) {
+      alert(`Erro ao salvar: ${err.message}`)
+    } finally {
+      setSalvando(false)
+    }
   }
 
-  const cancelarPedido = (id) => {
-    setPedidos(pedidos.map(p =>
-      p.id === id && p.status === 1
-        ? { ...p, status: 4 }
-        : p
-    ))
+  const cancelarPedido = async (id) => {
+    if (!confirm('Cancelar este pedido?')) return
+    try {
+      await api.patch(`/entregas/${id}`, { status: 'cancelado' })
+      carregarTudo()
+    } catch (err) {
+      alert(`Erro ao cancelar: ${err.message}`)
+    }
   }
 
   const renderConteudo = () => {
+    if (carregando) {
+      return <div className="dash-section"><p style={{ padding: 24 }}>Carregando...</p></div>
+    }
+    if (erroCarregamento) {
+      return (
+        <div className="dash-section">
+          <p style={{ padding: 24, color: '#c62828' }}>
+            {erroCarregamento}
+          </p>
+        </div>
+      )
+    }
+    if (lojas.length === 0) {
+      return (
+        <div className="dash-section">
+          <p style={{ padding: 24 }}>
+            Você ainda não tem lojas cadastradas. Peça ao admin para cadastrar uma loja vinculada à sua conta.
+          </p>
+        </div>
+      )
+    }
     if (secao === 'visao-geral') {
       return (
         <VisaoGeral
           resumo={resumo}
-          pedidos={pedidos}
-          onNovoPedido={() => setMostrarForm(true)}
+          entregas={entregas}
+          onNovoPedido={abrirNovoPedido}
         />
       )
     }
     if (secao === 'pedidos') {
       return (
         <Pedidos
-          pedidos={pedidos}
-          onNovoPedido={() => setMostrarForm(true)}
+          entregas={entregas}
+          onNovoPedido={abrirNovoPedido}
           onEditarPedido={editarPedido}
           onCancelarPedido={cancelarPedido}
         />
@@ -501,15 +585,15 @@ function LojistaDashboard() {
       </div>
 
       {mostrarForm && (
-        <FormNovoPedido
-          onClose={() => {
-            setMostrarForm(false)
-            setNovoPedido({ regiao: '', peso: '', tipo: 'Normal' })
-            setEditandoPedido(null)
-          }}
-          onCreate={editandoPedido ? salvarEdicao : criarPedido}
-          novoPedido={novoPedido}
-          setNovoPedido={setNovoPedido}
+        <FormPedido
+          onClose={fecharForm}
+          onSubmit={salvar}
+          form={form}
+          setForm={setForm}
+          regioes={regioes}
+          lojas={lojas}
+          editando={!!editando}
+          salvando={salvando}
         />
       )}
     </div>
