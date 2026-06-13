@@ -16,6 +16,7 @@ Aplicação React + Vite para gerenciamento de operações de entrega, com supor
 - [Jenkins (CI/CD)](#jenkins-cicd)
 - [Estrutura do projeto](#estrutura-do-projeto)
 - [Rotas da aplicação](#rotas-da-aplicação)
+- [Uso de Inteligência Artificial](#uso-de-inteligência-artificial)
 
 ---
 
@@ -252,3 +253,17 @@ Após o deploy bem-sucedido, o frontend estará disponível em `http://<ip-do-se
 | `/lojista` | `LojistaDashboard` | Lojista |
 
 A autenticação é verificada via `sessionStorage`. Usuários sem sessão ativa são redirecionados para `/`.
+
+---
+
+## Uso de Inteligência Artificial
+
+Este projeto contou com o auxílio do **Claude (Anthropic)** como ferramenta de apoio ao desenvolvimento. A IA foi utilizada nas seguintes frentes:
+
+- **Geração e revisão de código** — criação de componentes React, estilização CSS, lógica de formulários e integração com a API do backend.
+- **Escrita de testes** — elaboração dos casos de teste com Vitest e Testing Library, incluindo mocks de `fetch`, `navigate` e `sessionStorage`.
+- **Documentação** — redação e estruturação deste README, cobrindo instruções de instalação, Docker, Docker Compose e Jenkins.
+- **Revisão e refatoração** — sugestões de boas práticas, organização de arquivos e padronização de nomenclatura ao longo do desenvolvimento.
+
+O uso da IA teve caráter assistivo: todas as decisões de arquitetura, requisitos e validação final do código foram realizadas pela equipe de desenvolvimento.
+
