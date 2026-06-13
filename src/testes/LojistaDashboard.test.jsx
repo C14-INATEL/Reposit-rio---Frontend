@@ -32,7 +32,7 @@ function ok(data) {
 }
 
 function mockFetchPadrao() {
-  global.fetch = vi.fn().mockImplementation((url) => {
+  globalThis.fetch = vi.fn().mockImplementation((url) => {
     if (typeof url === 'string') {
       if (url.includes('/regioes')) return ok(regioesMock)
       if (url.includes('/lojas')) return ok(lojasMock)
@@ -206,7 +206,7 @@ describe('LojistaDashboard', () => {
 
   // --- NOVO ---
   it('exibe mensagem de empty state quando o lojista não tem lojas cadastradas', async () => {
-    global.fetch = vi.fn().mockImplementation((url) => {
+    globalThis.fetch = vi.fn().mockImplementation((url) => {
       if (typeof url === 'string') {
         if (url.includes('/lojas')) return ok([])
         if (url.includes('/regioes')) return ok(regioesMock)
@@ -229,7 +229,7 @@ describe('LojistaDashboard', () => {
   // --- NOVO ---
   it('cancela um pedido com status criado chamando PATCH /entregas/:id', async () => {
     let patchChamado = false
-    global.fetch = vi.fn().mockImplementation((url, opts) => {
+    globalThis.fetch = vi.fn().mockImplementation((url, opts) => {
       if (typeof url === 'string') {
         if (url.includes('/regioes')) return ok(regioesMock)
         if (url.includes('/lojas')) return ok(lojasMock)

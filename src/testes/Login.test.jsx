@@ -27,20 +27,20 @@ describe('Tela de Login', () => {
   it('renderiza os campos de usuário, senha e botão de entrar', () => {
     renderLogin()
 
-    expect(screen.getByPlaceholderText(/Digite seu usuário/i)).toBeInTheDocument()
+    expect(screen.getByPlaceholderText(/Digite seu e-mail/i)).toBeInTheDocument()
     expect(screen.getByPlaceholderText('Digite sua senha')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /entrar/i })).toBeInTheDocument()
   })
 
   it('navega para o dashboard quando o backend autentica um admin', async () => {
-    global.fetch = vi.fn().mockResolvedValue({
+    globalThis.fetch = vi.fn().mockResolvedValue({
       ok: true,
       json: async () => ({ mensagem: 'Login realizado com sucesso', tipo: 'admin' }),
     })
 
     renderLogin()
 
-    fireEvent.change(screen.getByPlaceholderText(/Digite seu usuário/i), {
+    fireEvent.change(screen.getByPlaceholderText(/Digite seu e-mail/i), {
       target: { value: 'admin@email.com' },
     })
     fireEvent.change(screen.getByPlaceholderText('Digite sua senha'), {
@@ -59,14 +59,14 @@ describe('Tela de Login', () => {
   })
 
   it('navega para a tela de lojista quando o backend autentica um lojista', async () => {
-    global.fetch = vi.fn().mockResolvedValue({
+    globalThis.fetch = vi.fn().mockResolvedValue({
       ok: true,
       json: async () => ({ mensagem: 'Login realizado com sucesso', tipo: 'lojista' }),
     })
 
     renderLogin()
 
-    fireEvent.change(screen.getByPlaceholderText(/Digite seu usuário/i), {
+    fireEvent.change(screen.getByPlaceholderText(/Digite seu e-mail/i), {
       target: { value: 'ana.santos@email.com' },
     })
     fireEvent.change(screen.getByPlaceholderText('Digite sua senha'), {
@@ -85,15 +85,15 @@ describe('Tela de Login', () => {
   })
 
   it('exibe mensagem de erro quando o backend rejeita as credenciais', async () => {
-    global.fetch = vi.fn().mockResolvedValue({
+    globalThis.fetch = vi.fn().mockResolvedValue({
       ok: false,
       json: async () => ({ mensagem: 'Usuário ou senha incorretos.' }),
     })
 
     renderLogin()
 
-    fireEvent.change(screen.getByPlaceholderText(/Digite seu usuário/i), {
-      target: { value: 'errado' },
+    fireEvent.change(screen.getByPlaceholderText(/Digite seu e-mail/i), {
+      target: { value: 'errado@email.com' },
     })
     fireEvent.change(screen.getByPlaceholderText('Digite sua senha'), {
       target: { value: 'errado' },

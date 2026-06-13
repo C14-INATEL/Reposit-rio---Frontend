@@ -37,7 +37,7 @@ describe('Dashboard — mock de chamadas à API', () => {
    * corretamente ao receber uma resposta positiva da API.
    */
   it('redireciona para o dashboard ao autenticar via backend com mock do fetch', async () => {
-    global.fetch = vi.fn().mockResolvedValue({
+    globalThis.fetch = vi.fn().mockResolvedValue({
       ok: true,
       json: async () => ({ tipo: 'operador' }),
     })
@@ -48,8 +48,8 @@ describe('Dashboard — mock de chamadas à API', () => {
       </MemoryRouter>
     )
 
-    fireEvent.change(screen.getByPlaceholderText('Digite seu usuário'), {
-      target: { value: 'fernanda' },
+    fireEvent.change(screen.getByPlaceholderText('Digite seu e-mail'), {
+      target: { value: 'fernanda.lima@duck.com' },
     })
     fireEvent.change(screen.getByPlaceholderText('Digite sua senha'), {
       target: { value: 'senha123' },
@@ -63,9 +63,12 @@ describe('Dashboard — mock de chamadas à API', () => {
       )
     })
 
-    expect(global.fetch).toHaveBeenCalledWith(
+    expect(globalThis.fetch).toHaveBeenCalledWith(
       'http://localhost:3000/login',
-      expect.objectContaining({ method: 'POST' })
+      expect.objectContaining({
+        method: 'POST',
+        body: JSON.stringify({ email: 'fernanda.lima@duck.com', senha: 'senha123' }),
+      })
     )
   })
 

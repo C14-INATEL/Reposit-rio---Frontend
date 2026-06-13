@@ -30,10 +30,6 @@ const entregaMock = {
   regiao_custo_base: '25.00',
 }
 
-function ok(data) {
-  return Promise.resolve({ ok: true, json: async () => data })
-}
-
 function notFound() {
   return Promise.resolve({ ok: false, status: 404, json: async () => ({ mensagem: 'Entrega não encontrada' }) })
 }
@@ -42,7 +38,7 @@ describe('Rastreio - Testes com Mock', () => {
 
   beforeEach(() => {
     vi.clearAllMocks()
-    global.fetch = vi.fn().mockResolvedValue({
+    globalThis.fetch = vi.fn().mockResolvedValue({
       ok: true,
       json: async () => entregaMock,
     })
@@ -92,7 +88,7 @@ describe('Rastreio - Testes com Mock', () => {
 
   // --- NOVO ---
   it('exibe erro quando o backend retorna 404 para o código de rastreio', async () => {
-    global.fetch = vi.fn().mockImplementation(() => notFound())
+    globalThis.fetch = vi.fn().mockImplementation(() => notFound())
 
     render(
       <MemoryRouter>

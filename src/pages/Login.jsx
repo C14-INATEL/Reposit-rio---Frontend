@@ -6,7 +6,7 @@ function Login() {
   const navigate = useNavigate()
   const [showPassword, setShowPassword] = useState(false)
   const [rememberMe, setRememberMe] = useState(false)
-  const [usuario, setUsuario] = useState('')
+  const [email, setEmail] = useState('')
   const [senha, setSenha] = useState('')
   const [erro, setErro] = useState('')
   const [carregando, setCarregando] = useState(false)
@@ -20,25 +20,18 @@ function Login() {
       const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000'
       console.log('Tentando conectar em:', `${apiUrl}/login`)
 
-      // Detecta se o campo é email ou nome de usuário
-      const isEmail = usuario.includes('@')
-      const body = isEmail
-        ? { email: usuario, senha }
-        : { usuario, senha }
-      
       const response = await fetch(`${apiUrl}/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(body),
+        body: JSON.stringify({ email, senha }),
       })
 
       if (response.ok) {
         const data = await response.json()
 
-        // Nome legível para o header — preferimos o nome retornado pelo backend
-        const nomeExibicao = data.usuario?.nome || usuario
+        const nomeExibicao = data.usuario?.nome || email
 
         sessionStorage.setItem('usuario', nomeExibicao)
         sessionStorage.setItem('tipo', data.tipo)
@@ -50,7 +43,7 @@ function Login() {
         }
 
         if (rememberMe) {
-          localStorage.setItem('usuarioSalvo', usuario)
+          localStorage.setItem('usuarioSalvo', email)
         }
 
         if (data.tipo === 'lojista') {
@@ -60,7 +53,7 @@ function Login() {
         }
       } else {
         const data = await response.json()
-        setErro(data.mensagem || 'Usuário ou senha incorretos.')
+        setErro(data.mensagem || 'Email ou senha incorretos.')
       }
     } catch (err) {
       console.error('Erro ao conectar com o backend:', err)
@@ -106,20 +99,20 @@ function Login() {
           <form className="login-form" onSubmit={handleSubmit}>
             {/* Campo Usuário */}
             <div className="login-field">
-              <label className="login-label">Usuário ou E-mail</label>
-              <div className="login-input-wrapper">
-                <span className="login-input-icon">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#aaa" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                    <circle cx="12" cy="7" r="4"/>
-                  </svg>
-                </span>
-                <input
-                  type="text"
-                  className="login-input"
-                  placeholder="Digite seu usuário ou e-mail"
-                  value={usuario}
-                  onChange={(e) => setUsuario(e.target.value)}
+<label className="login-label">E-mail</label>
+                <div className="login-input-wrapper">
+                  <span className="login-input-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#aaa" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                      <circle cx="12" cy="7" r="4"/>
+                    </svg>
+                  </span>
+                  <input
+                    type="email"
+                    className="login-input"
+                    placeholder="Digite seu e-mail"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                   required
                 />
               </div>

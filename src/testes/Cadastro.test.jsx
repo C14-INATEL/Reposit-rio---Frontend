@@ -10,27 +10,30 @@ const renderCadastro = () =>
     </MemoryRouter>
   )
 
-function preencherForm({ nome = 'João Silva', email = 'joao@email.com', senha = 'senha123', confirmar = 'senha123' } = {}) {
+function preencherForm({
+  nome = 'Joao Silva',
+  email = 'joao@email.com',
+  senha = 'senha123',
+  confirmar = 'senha123',
+} = {}) {
   fireEvent.change(screen.getByPlaceholderText('Digite seu nome completo'), { target: { value: nome } })
   fireEvent.change(screen.getByPlaceholderText('Digite seu e-mail'), { target: { value: email } })
-  fireEvent.change(screen.getByPlaceholderText('Mín. 6 caracteres'), { target: { value: senha } })
+  fireEvent.change(screen.getByPlaceholderText(/6 caracteres/i), { target: { value: senha } })
   fireEvent.change(screen.getByPlaceholderText('Repita sua senha'), { target: { value: confirmar } })
 }
 
 describe('Tela de Cadastro', () => {
-
   beforeEach(() => {
-    // Reset do fetch — cada teste configura o seu se precisar
-    global.fetch = undefined
+    globalThis.fetch = undefined
   })
 
-  it('exibe erro quando as senhas não coincidem', async () => {
+  it('exibe erro quando as senhas nao coincidem', async () => {
     renderCadastro()
     preencherForm({ confirmar: 'senha456' })
     fireEvent.click(screen.getByRole('button', { name: /criar conta/i }))
 
     await waitFor(() => {
-      expect(screen.getByText('As senhas não coincidem.')).toBeInTheDocument()
+      expect(screen.getByText(/As senhas.*coincidem/i)).toBeInTheDocument()
     })
   })
 
@@ -40,24 +43,24 @@ describe('Tela de Cadastro', () => {
     fireEvent.click(screen.getByRole('button', { name: /criar conta/i }))
 
     await waitFor(() => {
-      expect(screen.getByText('A senha deve ter pelo menos 6 caracteres.')).toBeInTheDocument()
+      expect(screen.getByText(/A senha deve ter pelo menos 6 caracteres/i)).toBeInTheDocument()
     })
   })
 
-  it('exibe erro quando nenhum tipo de conta é selecionado', async () => {
+  it('exibe erro quando nenhum tipo de conta e selecionado', async () => {
     renderCadastro()
     preencherForm()
     fireEvent.click(screen.getByRole('button', { name: /criar conta/i }))
 
     await waitFor(() => {
-      expect(screen.getByText('Selecione um tipo de conta.')).toBeInTheDocument()
+      expect(screen.getByText(/Selecione um tipo de conta/i)).toBeInTheDocument()
     })
   })
 
   it('exibe mensagem de sucesso quando o backend confirma o cadastro', async () => {
-    global.fetch = vi.fn().mockResolvedValue({
+    globalThis.fetch = vi.fn().mockResolvedValue({
       ok: true,
-      json: async () => ({ mensagem: 'Usuário cadastrado com sucesso', usuario: { id: 99, tipo: 'operador' } }),
+      json: async () => ({ mensagem: 'Usuario cadastrado com sucesso', usuario: { id: 99, tipo: 'operador' } }),
     })
 
     renderCadastro()
@@ -73,11 +76,44 @@ describe('Tela de Cadastro', () => {
     }, { timeout: 2000 })
   })
 
-  it('exibe mensagem de erro quando o backend rejeita e-mail já cadastrado', async () => {
-    global.fetch = vi.fn().mockResolvedValue({
+  it('envia tipo lojista ao criar uma conta de lojista', async () => {
+    globalThis.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ mensagem: 'Usuario cadastrado com sucesso', usuario: { id: 100, tipo: 'lojista' } }),
+    })
+
+    renderCadastro()
+    preencherForm({
+      nome: 'Lojista Teste',
+      email: 'lojista@email.com',
+    })
+
+    fireEvent.click(screen.getByText('Selecione o tipo de conta'))
+    fireEvent.click(screen.getByText('Lojista'))
+
+    fireEvent.click(screen.getByRole('button', { name: /criar conta/i }))
+
+    await waitFor(() => {
+      expect(globalThis.fetch).toHaveBeenCalledWith(
+        expect.stringContaining('/cadastro'),
+        expect.objectContaining({
+          method: 'POST',
+          body: JSON.stringify({
+            nome: 'Lojista Teste',
+            email: 'lojista@email.com',
+            senha: 'senha123',
+            tipo: 'lojista',
+          }),
+        })
+      )
+    })
+  })
+
+  it('exibe mensagem de erro quando o backend rejeita email ja cadastrado', async () => {
+    globalThis.fetch = vi.fn().mockResolvedValue({
       ok: false,
       status: 409,
-      json: async () => ({ mensagem: 'Este e-mail já está em uso.' }),
+      json: async () => ({ mensagem: 'Este e-mail ja esta em uso.' }),
     })
 
     renderCadastro()
@@ -89,8 +125,7 @@ describe('Tela de Cadastro', () => {
     fireEvent.click(screen.getByRole('button', { name: /criar conta/i }))
 
     await waitFor(() => {
-      expect(screen.getByText(/Este e-mail já está em uso/i)).toBeInTheDocument()
+      expect(screen.getByText(/Este e-mail ja esta em uso/i)).toBeInTheDocument()
     })
   })
-
 })
